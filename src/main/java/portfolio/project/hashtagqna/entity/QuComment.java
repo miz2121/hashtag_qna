@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class QuComment {
     @Id
     @GeneratedValue
-    @Column(name = "QU_COMMENT_ID", updatable = false, nullable = false)
+    @Column(name = "QU_COMMENT_ID")
     private Long id;
 
     @Column(length = 1500, nullable = false)
@@ -32,6 +32,12 @@ public class QuComment {
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
+    /**
+     * addQuestionAndMember(createdQuestion, commentWriter) 해 줘야 함
+     * @param content
+     * @param question
+     * @param member
+     */
     @Builder
     public QuComment(String content, Question question, Member member) {
         this.content = content;
@@ -44,9 +50,9 @@ public class QuComment {
     /**
      * 연관관계 편의 메소드
      * @param question
-     * @param member
+     * @param commentWriter
      */
-    public void addQuestionAndMember(Question question, Member member){
+    public void addQuestionAndMember(Question question, Member commentWriter){
         if(this.question != null){
             this.question.getQuComments().remove(this);
         }
@@ -57,7 +63,7 @@ public class QuComment {
         if(this.member != null){
             this.member.getAnComments().remove(this);
         }
-        this.member = member;
+        this.member = commentWriter;
         member.getQuComments().add(this);
         member.increaseCommentCount();
     }

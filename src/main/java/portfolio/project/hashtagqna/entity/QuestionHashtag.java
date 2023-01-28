@@ -10,7 +10,7 @@ import lombok.*;
 public class QuestionHashtag {
     @Id
     @GeneratedValue
-    @Column(name = "QUESTION_ID", updatable = false, nullable = false)
+    @Column(name = "QUESTION_HASHTAG_ID")
     private Long id;
 
     @ManyToOne
@@ -21,22 +21,15 @@ public class QuestionHashtag {
     @JoinColumn(name = "HASHTAG_ID")
     private Hashtag hashtag;
 
+    /**
+     * addQuestionAndHashtag(createdQuestion, createdHashtag) 해 줘야 함.
+     * @param question
+     * @param hashtag
+     */
     @Builder
     public QuestionHashtag(Question question, Hashtag hashtag) {
         this.question = question;
         this.hashtag = hashtag;
-    }
-
-    /**
-     * 연관관계 편의 메소드
-     * @param question
-     */
-    public void addQuestion(Question question){
-        if(this.question != null){
-            this.question.getQuestionHashtags().remove(this);
-        }
-        this.question = question;
-        question.getQuestionHashtags().add(this);
     }
 
     /**

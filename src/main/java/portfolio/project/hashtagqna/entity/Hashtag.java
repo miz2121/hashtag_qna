@@ -13,7 +13,7 @@ import java.util.List;
 public class Hashtag {
     @Id
     @GeneratedValue
-    @Column(name = "HASHTAG_ID", updatable = false, nullable = false)
+    @Column(name = "HASHTAG_ID")
     private Long id;
 
     @Column(length = 60, nullable = false)
@@ -27,6 +27,11 @@ public class Hashtag {
     @ToString.Exclude
     private List<QuestionHashtag> questionHashtags = new ArrayList<>();
 
+    /**
+     * addMember(questionWriter) 해줘야 함
+     * @param hashtagName
+     * @param member
+     */
     @Builder
     public Hashtag(String hashtagName, Member member) {
         this.hashtagName = hashtagName;

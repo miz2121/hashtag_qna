@@ -17,7 +17,7 @@ import java.util.List;
 public class Answer {
     @Id
     @GeneratedValue
-    @Column(name = "ANSWER_ID", updatable = false, nullable = false)
+    @Column(name = "ANSWER_ID")
     private Long id;
 
     @Column(length = 60, nullable = false)
@@ -31,7 +31,7 @@ public class Answer {
 
     @Column(nullable = false, columnDefinition = "CHAR(1) DEFAULT '0'", length = 1)
     @Setter
-    private String selected;
+    private String selected = "0";
 
     @Column(name = "AN_COMMENT_COUNT", nullable = false)
     @ColumnDefault("0")
@@ -55,6 +55,12 @@ public class Answer {
     @ToString.Exclude
     private List<AnComment> anComments = new ArrayList<>();
 
+    /**
+     * addQuestionAndMember(createdQuestion, answerWriter) 해 줘야 함.
+     * @param content
+     * @param question
+     * @param member
+     */
     @Builder
     public Answer(String content, Question question, Member member) {
         this.writer = member.getNickname();
@@ -76,17 +82,15 @@ public class Answer {
 
     public Long increaseAnCommentCount(){
         setAnCommentCount(getAnCommentCount() + 1);
-        Member member = getMember();
-        member.setCommentCount(member.getCommentCount() + 1);
         return getId();
     }
 
     /**
      * 연관관계 편의 메소드
      * @param question
-     * @param member
+     * @param answerWriter
      */
-    public void addQuestionAndMember(Question question, Member member){
+    public void addQuestionAndMember(Question question, Member answerWriter){
         if(this.question != null){
             this.question.getAnswers().remove(this);
         }
@@ -97,7 +101,7 @@ public class Answer {
         if(this.member != null){
             this.member.getAnswers().remove(this);
         }
-        this.member = member;
+        this.member = answerWriter;
         member.getAnswers().add(this);
         member.increaseAnswerCount();
     }

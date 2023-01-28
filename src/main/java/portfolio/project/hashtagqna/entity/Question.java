@@ -17,7 +17,7 @@ import java.util.List;
 public class Question {
     @Id
     @GeneratedValue
-    @Column(name = "QUESTION_ID", updatable = false, nullable = false)
+    @Column(name = "QUESTION_ID")
     private Long id;
 
     @Column(length = 1500, nullable = false)
@@ -41,11 +41,11 @@ public class Question {
 
     @Column(nullable = false, columnDefinition = "CHAR(1) DEFAULT '0'", length = 1)
     @Setter
-    private String closed;
+    private String closed = "0";
 
     @Column(name = "WAITING_SELECTION", nullable = false, columnDefinition = "CHAR(1) DEFAULT '0'", length = 1)
     @Setter
-    private String waitingSelection;
+    private String waitingSelection = "0";
 
     @ManyToOne
     @JoinColumn(name = "MEMBER_ID")
@@ -63,6 +63,11 @@ public class Question {
     @ToString.Exclude
     private List<QuComment> quComments = new ArrayList<>();
 
+    /**
+     * addMember(questionWriter) 해 줘야 함.
+     * @param content
+     * @param member
+     */
     @Builder
     public Question(String content, Member member) {
         this.content = content;
@@ -73,13 +78,20 @@ public class Question {
 
     public Long increaseQuCommentCount(){
         setQuCommentCount(getQuCommentCount() + 1);
-        member.setCommentCount(member.getCommentCount() + 1);
         return getId();
     }
 
     public Long increaseAnswerCount(){
         setAnswerCount(getAnswerCount() + 1);
-        member.setAnswerCount(member.getAnswerCount() + 1);
         return getId();
+    }
+
+    public void addMember(Member questionWriter){
+        if(this.member != null){
+            this.member.getQuestions().remove(this);
+        }
+        this.member = questionWriter;
+        member.getQuestions().add(this);
+        member.increaseQuestionCount();
     }
 }

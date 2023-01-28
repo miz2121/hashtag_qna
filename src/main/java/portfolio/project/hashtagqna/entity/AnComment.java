@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class AnComment {
     @Id
     @GeneratedValue
-    @Column(name = "AN_COMMENT_ID", updatable = false, nullable = false)
+    @Column(name = "AN_COMMENT_ID")
     private Long id;
 
     @Column(length = 1500, nullable = false)
@@ -32,6 +32,12 @@ public class AnComment {
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
+    /**
+     * addAnswerAndMember(createdAnswer, commentWriter) 해 줘야 함.
+     * @param content
+     * @param answer
+     * @param member
+     */
     @Builder
     public AnComment(String content, Answer answer, Member member) {
         this.content = content;
@@ -44,9 +50,9 @@ public class AnComment {
     /**
      * 연관관계 편의 메소드
      * @param answer
-     * @param member
+     * @param commentWriter
      */
-    public void addAnswerAndMember(Answer answer, Member member){
+    public void addAnswerAndMember(Answer answer, Member commentWriter){
         if(this.answer != null){
             this.answer.getAnComments().remove(this);
         }
@@ -57,7 +63,7 @@ public class AnComment {
         if(this.member != null){
             this.member.getAnComments().remove(this);
         }
-        this.member = member;
+        this.member = commentWriter;
         member.getAnComments().add(this);
         member.increaseCommentCount();
     }

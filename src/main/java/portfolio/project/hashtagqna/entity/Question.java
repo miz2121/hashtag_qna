@@ -14,11 +14,14 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString
-public class Question {
+public class Question extends BaseEntity{
     @Id
     @GeneratedValue
     @Column(name = "QUESTION_ID")
     private Long id;
+
+    @Column(length = 300, nullable = false)
+    private String title;
 
     @Column(length = 1500, nullable = false)
     private String content;
@@ -69,7 +72,8 @@ public class Question {
      * @param member
      */
     @Builder
-    public Question(String content, Member member) {
+    public Question(String title, String content, Member member) {
+        this.title = title;
         this.content = content;
         this.date = LocalDateTime.now();
         this.writer = member.getNickname();

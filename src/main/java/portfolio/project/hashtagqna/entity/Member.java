@@ -29,6 +29,9 @@ public class Member extends BaseEntity{
     @Column(length = 60, nullable = false)
     private String nickname;
 
+    @Enumerated(EnumType.STRING)
+    private MemberStatus status;
+
     @Column(name = "QUESTION_COUNT", nullable = false)
     @ColumnDefault("0")
     @Setter
@@ -74,6 +77,7 @@ public class Member extends BaseEntity{
         this.email = email;
         this.pwd = pwd;
         this.nickname = nickname;
+        this.status = MemberStatus.ACTIVE;
     }
 
     public Long increaseQuestionCount(){
@@ -94,5 +98,9 @@ public class Member extends BaseEntity{
     public Long increaseCommentCount(){
         setCommentCount(getCommentCount() + 1);
         return getId();
+    }
+
+    public String getInactiveMessage(){
+        return "탈퇴한 회원의 정보입니다.";
     }
 }

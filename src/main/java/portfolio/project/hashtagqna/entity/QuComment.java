@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString
-public class QuComment {
+public class QuComment extends BaseEntity{
     @Id
     @GeneratedValue
     @Column(name = "QU_COMMENT_ID")

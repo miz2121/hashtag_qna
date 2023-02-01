@@ -10,7 +10,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString
-public class Hashtag {
+public class Hashtag extends BaseEntity{
     @Id
     @GeneratedValue
     @Column(name = "HASHTAG_ID")

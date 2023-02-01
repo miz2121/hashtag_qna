@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString
-public class QuestionHashtag {
+public class QuestionHashtag extends BaseEntity{
     @Id
     @GeneratedValue
     @Column(name = "QUESTION_HASHTAG_ID")

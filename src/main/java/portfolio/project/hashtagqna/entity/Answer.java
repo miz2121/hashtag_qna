@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString
-public class Answer {
+public class Answer extends BaseEntity{
     @Id
     @GeneratedValue
     @Column(name = "ANSWER_ID")

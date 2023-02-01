@@ -11,5 +11,11 @@ spring:
     hiddenmethod:
       filter:
         enabled: true
+  output:
+    ansi:
+      enabled: always
 logging.level:
   org.hibernate.SQL: debug
+logging:
+  file:
+    name: /logs/logText.log

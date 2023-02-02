@@ -110,31 +110,6 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
         em.flush();
         em.clear();
         // 위 5개 update 문을 하나로 합치고 싶다...
-//        queryFactory
-//                .update(member)
-//                .set(member.status, MemberStatus.INACTIVE)
-//                .set(question.title, message)
-//                .set(question.content, message)
-//                .set(question.writer, message)
-//                .set(answer.content, message)
-//                .set(answer.writer, message)
-//                .set(anComment.content, message)
-//                .set(anComment.writer, message)
-//                .set(quComment.content, message)
-//                .set(quComment.writer, message)
-//                .where(member.id.eq(
-//                        JPAExpressions.select(answer.member.id)
-//                                .from(answer)
-//                                .join(answer.question, question).fetchJoin()
-//                                .on(answer.member.eq(question.member))
-//                                .join(anComment.answer, answer).fetchJoin()
-//                                .on(anComment.member.eq(answer.member))
-//                                .join(quComment.question, question).fetchJoin()
-//                                .on(quComment.member.eq(question.member))
-//                ))
-//                .execute();
-//        em.flush();
-//        em.clear();
         return memberId;
     }
 

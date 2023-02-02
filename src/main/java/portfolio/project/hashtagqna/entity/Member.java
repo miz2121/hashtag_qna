@@ -30,6 +30,7 @@ public class Member extends BaseEntity{
     private String nickname;
 
     @Enumerated(EnumType.STRING)
+    @Setter
     private MemberStatus status;
 
     @Column(name = "QUESTION_COUNT", nullable = false)
@@ -52,23 +53,23 @@ public class Member extends BaseEntity{
     @Setter
     private int commentCount = 0;
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<Question> questions = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<Answer> answers = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<Hashtag> hashtags = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<QuComment> quComments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<AnComment> anComments = new ArrayList<>();
 

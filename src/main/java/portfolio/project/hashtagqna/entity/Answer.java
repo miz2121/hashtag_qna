@@ -29,9 +29,9 @@ public class Answer extends BaseEntity{
     @Column(length = 1500, nullable = false)
     private String content;
 
-    @Column(nullable = false, columnDefinition = "CHAR(1) DEFAULT '0'", length = 1)
+    @Enumerated(EnumType.STRING)
     @Setter
-    private String selected = "0";
+    private AnswerStatus answerStatus;
 
     @Column(name = "AN_COMMENT_COUNT", nullable = false)
     @ColumnDefault("0")
@@ -43,15 +43,15 @@ public class Answer extends BaseEntity{
     @Setter
     private int rating = 0;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "QUESTION_ID")
     private Question question;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
-    @OneToMany(mappedBy = "answer")
+    @OneToMany(mappedBy = "answer", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @ToString.Exclude
     private List<AnComment> anComments = new ArrayList<>();
 
@@ -68,10 +68,11 @@ public class Answer extends BaseEntity{
         this.content = content;
         this.question = question;
         this.member = member;
+        this.answerStatus = AnswerStatus.UNSELECTED;
     }
 
     public Long selectAnswer(){
-        setSelected("1");
+        setAnswerStatus(AnswerStatus.SELECTED);
         return getId();
     }
 

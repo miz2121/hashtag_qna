@@ -13,11 +13,11 @@ public class QuestionHashtag extends BaseEntity{
     @Column(name = "QUESTION_HASHTAG_ID")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "QUESTION_ID")
     private Question question;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "HASHTAG_ID")
     private Hashtag hashtag;
 

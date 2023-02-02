@@ -24,11 +24,11 @@ public class AnComment extends BaseEntity{
     @Column(length = 60, nullable = false)
     private String writer;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ANSWER_ID")
     private Answer answer;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 

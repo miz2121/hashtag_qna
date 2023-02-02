@@ -42,15 +42,11 @@ public class Question extends BaseEntity{
     @Setter
     private int answerCount = 0;
 
-    @Column(nullable = false, columnDefinition = "CHAR(1) DEFAULT '0'", length = 1)
+    @Enumerated(EnumType.STRING)
     @Setter
-    private String closed = "0";
+    private QuestionStatus questionStatus;
 
-    @Column(name = "WAITING_SELECTION", nullable = false, columnDefinition = "CHAR(1) DEFAULT '0'", length = 1)
-    @Setter
-    private String waitingSelection = "0";
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
@@ -58,11 +54,11 @@ public class Question extends BaseEntity{
     @ToString.Exclude
     private List<QuestionHashtag> questionHashtags = new ArrayList<>();
 
-    @OneToMany(mappedBy = "question")
+    @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @ToString.Exclude
     private List<Answer> answers = new ArrayList<>();
 
-    @OneToMany(mappedBy = "question")
+    @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @ToString.Exclude
     private List<QuComment> quComments = new ArrayList<>();
 
@@ -78,6 +74,12 @@ public class Question extends BaseEntity{
         this.date = LocalDateTime.now();
         this.writer = member.getNickname();
         this.member = member;
+        this.questionStatus = QuestionStatus.OPEN;
+    }
+
+    public Long closeQuestion(){
+        setQuestionStatus(QuestionStatus.CLOSED);
+        return getId();
     }
 
     public Long increaseQuCommentCount(){

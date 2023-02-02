@@ -19,7 +19,7 @@ public class Hashtag extends BaseEntity{
     @Column(length = 60, nullable = false)
     private String hashtagName;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 

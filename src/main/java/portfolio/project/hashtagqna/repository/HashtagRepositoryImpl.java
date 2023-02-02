@@ -15,13 +15,12 @@ import static portfolio.project.hashtagqna.entity.QHashtag.hashtag;
 
 public class HashtagRepositoryImpl implements HashtagRepositoryCustom {
     private final JPAQueryFactory queryFactory;
-//    private final EntityManager em;
 
     public HashtagRepositoryImpl(EntityManager em) {
         this.queryFactory = new JPAQueryFactory(em);
-//        this.em = em;
     }
 
+    @Override
     public List<HashtagDto> findAllHashtags() {
         return queryFactory
                 .select(new QHashtagDto(
@@ -31,6 +30,7 @@ public class HashtagRepositoryImpl implements HashtagRepositoryCustom {
                 .fetch();
     }
 
+    @Override
     public List<HashtagDto> findAllSelectedHashtagsByHashtagNames(String... names){
         List<HashtagDto> hashtagDtos = new ArrayList<>();
         for (String name : names) {
@@ -46,6 +46,7 @@ public class HashtagRepositoryImpl implements HashtagRepositoryCustom {
         return hashtagDtos;
     }
 
+    @Override
     public List<HashtagDto> findMyAllHashtags(Member member){
         return queryFactory
                 .select(new QHashtagDto(

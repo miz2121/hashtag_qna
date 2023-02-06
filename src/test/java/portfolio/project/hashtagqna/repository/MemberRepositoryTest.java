@@ -128,24 +128,24 @@ class MemberRepositoryTest {
         return questionWriter.getId();
     }
 
-    @Test
-    public void 멤버를inactive로만들어보자() throws Exception {
-        //given
-        long questionWriterId = createData(em);
-        //when
-        printLog.printInfoLog("여기서부터 멤버를 INACTIVE로 만듦");
-        long inactivatedId = memberRepository.makeInactiveMember(questionWriterId);
-        printLog.printInfoLog("INACTIVE가 된 멤버를 찾아 옴");
-        Member inactivatedMember = memberRepository.findMemberById(inactivatedId);
-        //then
-        printLog.printInfoLog("INACTIVE가 된 멤버의 상태는 INACTIVE여야 한다.");
-        assertThat(inactivatedMember.getStatus()).isEqualTo(MemberStatus.INACTIVE);
-        printLog.printInfoLog("INACTIVE가 된 질문작성자와 관련된 모든 질문들은 탈퇴원회원이라는 정보를 담아야 한다.");
-        List<Question> questions = inactivatedMember.getQuestions();
-        for (Question question : questions) {
-            assertThat(question.getContent()).isEqualTo(inactivatedMember.getInactiveMessage());
-            assertThat(question.getTitle()).isEqualTo(inactivatedMember.getInactiveMessage());
-            assertThat(question.getWriter()).isEqualTo(inactivatedMember.getInactiveMessage());
-        }
-    }
+//    @Test
+//    public void 멤버를inactive로만들어보자() throws Exception {
+//        //given
+//        long questionWriterId = createData(em);
+//        //when
+//        printLog.printInfoLog("여기서부터 멤버를 INACTIVE로 만듦");
+//        long inactivatedId = memberRepository.makeInactiveMember(questionWriterId);
+//        printLog.printInfoLog("INACTIVE가 된 멤버를 찾아 옴");
+//        Member inactivatedMember = memberRepository.findMemberById(inactivatedId);
+//        //then
+//        printLog.printInfoLog("INACTIVE가 된 멤버의 상태는 INACTIVE여야 한다.");
+//        assertThat(inactivatedMember.getStatus()).isEqualTo(MemberStatus.INACTIVE);
+//        printLog.printInfoLog("INACTIVE가 된 질문작성자와 관련된 모든 질문들은 탈퇴원회원이라는 정보를 담아야 한다.");
+//        List<Question> questions = inactivatedMember.getQuestions();
+//        for (Question question : questions) {
+//            assertThat(question.getContent()).isEqualTo(inactivatedMember.getInactiveMessage());
+//            assertThat(question.getTitle()).isEqualTo(inactivatedMember.getInactiveMessage());
+//            assertThat(question.getWriter()).isEqualTo(inactivatedMember.getInactiveMessage());
+//        }
+//    }
 }

@@ -21,11 +21,11 @@ public class HashtagRepositoryImpl implements HashtagRepositoryCustom {
     }
 
     @Override
-    public List<HashtagDto> findAllHashtags() {
+    public List<HashtagDto> viewAllHashtags() {
         return queryFactory
                 .select(new QHashtagDto(
                         hashtag.hashtagName,
-                        hashtag.member))
+                        hashtag.member.nickname))
                 .from(hashtag)
                 .fetch();
     }
@@ -37,7 +37,7 @@ public class HashtagRepositoryImpl implements HashtagRepositoryCustom {
             HashtagDto hashtagDto = queryFactory
                     .select(new QHashtagDto(
                             hashtag.hashtagName,
-                            hashtag.member))
+                            hashtag.member.nickname))
                     .from(hashtag)
                     .where(hashtag.hashtagName.eq(name))
                     .fetchFirst();
@@ -47,11 +47,11 @@ public class HashtagRepositoryImpl implements HashtagRepositoryCustom {
     }
 
     @Override
-    public List<HashtagDto> findMyAllHashtags(Member member){
+    public List<HashtagDto> viewMyAllHashtags(Member member){
         return queryFactory
                 .select(new QHashtagDto(
                         hashtag.hashtagName,
-                        hashtag.member))
+                        hashtag.member.nickname))
                 .from(hashtag)
                 .where(hashtag.member.eq(member))
                 .fetch();

@@ -7,12 +7,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
-import portfolio.project.hashtagqna.dto.QQuestionDto;
-import portfolio.project.hashtagqna.dto.QuestionDto;
+import portfolio.project.hashtagqna.dto.*;
 import portfolio.project.hashtagqna.entity.Member;
 import portfolio.project.hashtagqna.entity.Question;
 
 import java.util.List;
+
 
 import static portfolio.project.hashtagqna.entity.QAnComment.anComment;
 import static portfolio.project.hashtagqna.entity.QAnswer.answer;
@@ -32,11 +32,31 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     }
 
     @Override
-    public List<QuestionDto> showFiveQuestions() {
+    public List<QuestionDto> viewQuestion(Long id) {
         return queryFactory
                 .select(new QQuestionDto(
+                                question.title,
+                                question.writer,
+                                question.date,
+                                question.content,
+                                question.questionStatus,
+                                question.quCommentCount,
+                                question.answerCount))
+                .from(question)
+                .join(question.questionHashtags, questionHashtag).fetchJoin()
+                .join(questionHashtag.hashtag, hashtag).fetchJoin()
+                .join(question.answers, answer).fetchJoin()
+                .join(answer.anComments, anComment).fetchJoin()
+                .join(question.quComments, quComment).fetchJoin()
+                .fetch();
+    }
+
+    @Override
+    public List<QuestionListDto> viewFiveQuestions() {
+        return queryFactory
+                .select(new QQuestionListDto(
                         question.writer,
-                        question.closed,
+                        question.questionStatus,
                         question.answerCount,
                         question.date))
                 .from(question)
@@ -47,11 +67,11 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     }
 
     @Override
-    public Page<QuestionDto> showQuestionPagingOrdering(Pageable pageable) {
-        List<QuestionDto> content = queryFactory
-                .select(new QQuestionDto(
+    public Page<QuestionListDto> viewQuestionsPagingOrdering(Pageable pageable) {
+        List<QuestionListDto> content = queryFactory
+                .select(new QQuestionListDto(
                         question.writer,
-                        question.closed,
+                        question.questionStatus,
                         question.answerCount,
                         question.date))
                 .from(question)
@@ -66,11 +86,11 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     }
 
     @Override
-    public Page<QuestionDto> searchForQuestionWriterPagingOrdering(String text, Pageable pageable) {
-        List<QuestionDto> content = queryFactory
-                .select(new QQuestionDto(
+    public Page<QuestionListDto> searchForQuestionWriterPagingOrdering(String text, Pageable pageable) {
+        List<QuestionListDto> content = queryFactory
+                .select(new QQuestionListDto(
                         question.writer,
-                        question.closed,
+                        question.questionStatus,
                         question.answerCount,
                         question.date))
                 .from(question)
@@ -86,11 +106,11 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     }
 
     @Override
-    public Page<QuestionDto> searchForAnswerWriterPagingOrdering(String text, Pageable pageable) {
-        List<QuestionDto> content = queryFactory
-                .select(new QQuestionDto(
+    public Page<QuestionListDto> searchForAnswerWriterPagingOrdering(String text, Pageable pageable) {
+        List<QuestionListDto> content = queryFactory
+                .select(new QQuestionListDto(
                         question.writer,
-                        question.closed,
+                        question.questionStatus,
                         question.answerCount,
                         question.date))
                 .from(question)
@@ -107,11 +127,11 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     }
 
     @Override
-    public Page<QuestionDto> searchForCommentWriterPagingOrdering(String text, Pageable pageable) {
-        List<QuestionDto> content = queryFactory
-                .select(new QQuestionDto(
+    public Page<QuestionListDto> searchForCommentWriterPagingOrdering(String text, Pageable pageable) {
+        List<QuestionListDto> content = queryFactory
+                .select(new QQuestionListDto(
                         question.writer,
-                        question.closed,
+                        question.questionStatus,
                         question.answerCount,
                         question.date))
                 .from(question)
@@ -131,11 +151,11 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     }
 
     @Override
-    public Page<QuestionDto> searchForTitlePagingOrdering(String text, Pageable pageable) {
-        List<QuestionDto> content = queryFactory
-                .select(new QQuestionDto(
+    public Page<QuestionListDto> searchForTitlePagingOrdering(String text, Pageable pageable) {
+        List<QuestionListDto> content = queryFactory
+                .select(new QQuestionListDto(
                         question.writer,
-                        question.closed,
+                        question.questionStatus,
                         question.answerCount,
                         question.date))
                 .from(question)
@@ -151,11 +171,11 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     }
 
     @Override
-    public Page<QuestionDto> searchForContentPagingOrdering(String text, Pageable pageable) {
-        List<QuestionDto> content = queryFactory
-                .select(new QQuestionDto(
+    public Page<QuestionListDto> searchForContentPagingOrdering(String text, Pageable pageable) {
+        List<QuestionListDto> content = queryFactory
+                .select(new QQuestionListDto(
                         question.writer,
-                        question.closed,
+                        question.questionStatus,
                         question.answerCount,
                         question.date))
                 .from(question)
@@ -177,11 +197,11 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     }
 
     @Override
-    public Page<QuestionDto> searchForAllPagingOrdering(String text, Pageable pageable) {
-        List<QuestionDto> content = queryFactory
-                .select(new QQuestionDto(
+    public Page<QuestionListDto> searchForAllPagingOrdering(String text, Pageable pageable) {
+        List<QuestionListDto> content = queryFactory
+                .select(new QQuestionListDto(
                         question.writer,
-                        question.closed,
+                        question.questionStatus,
                         question.answerCount,
                         question.date))
                 .from(question)
@@ -240,11 +260,11 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     }
 
     @Override
-    public Page<QuestionDto> findMyQuestions(Pageable pageable, Member member) {
-        List<QuestionDto> content = queryFactory
-                .select(new QQuestionDto(
+    public Page<QuestionListDto> viewMyQuestions(Pageable pageable, Member member) {
+        List<QuestionListDto> content = queryFactory
+                .select(new QQuestionListDto(
                         question.writer,
-                        question.closed,
+                        question.questionStatus,
                         question.answerCount,
                         question.date))
                 .from(question)
@@ -260,11 +280,11 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     }
 
     @Override
-    public Page<QuestionDto> findMyComments(Pageable pageable, Member member) {
-        List<QuestionDto> content = queryFactory
-                .select(new QQuestionDto(
+    public Page<QuestionListDto> viewMyComments(Pageable pageable, Member member) {
+        List<QuestionListDto> content = queryFactory
+                .select(new QQuestionListDto(
                         question.writer,
-                        question.closed,
+                        question.questionStatus,
                         question.answerCount,
                         question.date))
                 .from(question)
@@ -284,11 +304,11 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     }
 
     @Override
-    public Page<QuestionDto> findMyAnswers(Pageable pageable, Member member) {
-        List<QuestionDto> content = queryFactory
-                .select(new QQuestionDto(
+    public Page<QuestionListDto> viewMyAnswers(Pageable pageable, Member member) {
+        List<QuestionListDto> content = queryFactory
+                .select(new QQuestionListDto(
                         question.writer,
-                        question.closed,
+                        question.questionStatus,
                         question.answerCount,
                         question.date))
                 .from(question)
@@ -305,11 +325,11 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     }
 
     @Override
-    public Page<QuestionDto> findMyHashtags(Pageable pageable, Member member) {
-        List<QuestionDto> content = queryFactory
-                .select(new QQuestionDto(
+    public Page<QuestionListDto> viewMyHashtags(Pageable pageable, Member member) {
+        List<QuestionListDto> content = queryFactory
+                .select(new QQuestionListDto(
                         question.writer,
-                        question.closed,
+                        question.questionStatus,
                         question.answerCount,
                         question.date))
                 .from(question)

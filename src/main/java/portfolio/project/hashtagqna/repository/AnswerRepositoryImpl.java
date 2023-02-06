@@ -4,7 +4,14 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.EntityManager;
 import org.springframework.transaction.annotation.Transactional;
+import portfolio.project.hashtagqna.dto.AnswerDto;
+import portfolio.project.hashtagqna.dto.QAnCommentDto;
+import portfolio.project.hashtagqna.dto.QAnswerDto;
 import portfolio.project.hashtagqna.entity.Answer;
+import portfolio.project.hashtagqna.entity.AnswerStatus;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 import static portfolio.project.hashtagqna.entity.QAnComment.anComment;
 import static portfolio.project.hashtagqna.entity.QAnswer.answer;
@@ -16,6 +23,25 @@ public class AnswerRepositoryImpl implements AnswerRepositoryCustom {
     public AnswerRepositoryImpl(EntityManager em) {
         this.queryFactory = new JPAQueryFactory(em);
         this.em = em;
+    }
+
+
+    // https://www.notion.so/V2-DTO-bcd7e97b3935458c910de08bd5a44bf2 참고
+    @Override
+    public List<AnswerDto> viewAnswers(Long questionId) {
+        return queryFactory
+                .select(new QAnswerDto(
+                        answer.writer,
+                        answer.date,
+                        answer.content,
+                        answer.answerStatus,
+                        answer.anCommentCount,
+                        answer.rating
+                        ))
+                .from(answer)
+                .join(answer.anComments, anComment)
+                .where(answer.question.id.eq(questionId))
+                .fetch();
     }
 
     @Override

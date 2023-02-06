@@ -2,37 +2,39 @@ package portfolio.project.hashtagqna.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import portfolio.project.hashtagqna.dto.QQuestionDto;
 import portfolio.project.hashtagqna.dto.QuestionDto;
+import portfolio.project.hashtagqna.dto.QuestionListDto;
 import portfolio.project.hashtagqna.entity.Member;
 import portfolio.project.hashtagqna.entity.Question;
 
 import java.util.List;
 
 public interface QuestionRepositoryCustom {
-    public List<QuestionDto> showFiveQuestions();
+    public List<QuestionDto> viewQuestion(Long id);
 
-    public Page<QuestionDto> showQuestionPagingOrdering(Pageable pageable);
+    public List<QuestionListDto> viewFiveQuestions();
 
-    public Page<QuestionDto> searchForQuestionWriterPagingOrdering(String text, Pageable pageable);
+    public Page<QuestionListDto> viewQuestionsPagingOrdering(Pageable pageable);
 
-    public Page<QuestionDto> searchForAnswerWriterPagingOrdering(String text, Pageable pageable);
+    public Page<QuestionListDto> searchForQuestionWriterPagingOrdering(String text, Pageable pageable);
 
-    public Page<QuestionDto> searchForCommentWriterPagingOrdering(String text, Pageable pageable);
+    public Page<QuestionListDto> searchForAnswerWriterPagingOrdering(String text, Pageable pageable);
 
-    public Page<QuestionDto> searchForTitlePagingOrdering(String text, Pageable pageable);
+    public Page<QuestionListDto> searchForCommentWriterPagingOrdering(String text, Pageable pageable);
 
-    public Page<QuestionDto> searchForContentPagingOrdering(String text, Pageable pageable);
+    public Page<QuestionListDto> searchForTitlePagingOrdering(String text, Pageable pageable);
 
-    public Page<QuestionDto> searchForAllPagingOrdering(String text, Pageable pageable);
+    public Page<QuestionListDto> searchForContentPagingOrdering(String text, Pageable pageable);
+
+    public Page<QuestionListDto> searchForAllPagingOrdering(String text, Pageable pageable);
 
     public long removeQuestion(Question rmQuestion);
 
-    public Page<QuestionDto> findMyQuestions(Pageable pageable, Member member);
+    public Page<QuestionListDto> viewMyQuestions(Pageable pageable, Member member);
 
-    public Page<QuestionDto> findMyComments(Pageable pageable, Member member);
+    public Page<QuestionListDto> viewMyComments(Pageable pageable, Member member);
 
-    public Page<QuestionDto> findMyAnswers(Pageable pageable, Member member);
+    public Page<QuestionListDto> viewMyAnswers(Pageable pageable, Member member);
 
-    public Page<QuestionDto> findMyHashtags(Pageable pageable, Member member);
+    public Page<QuestionListDto> viewMyHashtags(Pageable pageable, Member member);
 }

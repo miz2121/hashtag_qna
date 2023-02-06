@@ -3,7 +3,12 @@ package portfolio.project.hashtagqna.repository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import org.springframework.transaction.annotation.Transactional;
+import portfolio.project.hashtagqna.dto.AnCommentDto;
+import portfolio.project.hashtagqna.dto.QAnCommentDto;
 import portfolio.project.hashtagqna.entity.AnComment;
+import portfolio.project.hashtagqna.entity.Question;
+
+import java.util.List;
 
 import static portfolio.project.hashtagqna.entity.QAnComment.anComment;
 
@@ -14,6 +19,18 @@ public class AnCommentRepositoryImpl implements AnCommentRepositoryCustom {
     public AnCommentRepositoryImpl(EntityManager em) {
         this.queryFactory = new JPAQueryFactory(em);
         this.em = em;
+    }
+
+    @Override
+    public List<AnCommentDto> viewAnComments(Long questionId) {
+        return queryFactory
+                .select(new QAnCommentDto(
+                        anComment.writer,
+                        anComment.date,
+                        anComment.content))
+                .from(anComment)
+                .where(anComment.answer.question.id.eq(questionId))
+                .fetch();
     }
 
     @Override

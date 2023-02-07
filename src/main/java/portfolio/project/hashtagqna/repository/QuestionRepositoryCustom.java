@@ -10,7 +10,7 @@ import portfolio.project.hashtagqna.entity.Question;
 import java.util.List;
 
 public interface QuestionRepositoryCustom {
-    public List<QuestionDto> viewQuestion(Long id);
+    public QuestionDto viewQuestion(Long id);
 
     public List<QuestionListDto> viewFiveQuestions();
 

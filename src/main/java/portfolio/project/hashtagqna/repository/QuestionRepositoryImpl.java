@@ -32,23 +32,19 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     }
 
     @Override
-    public List<QuestionDto> viewQuestion(Long id) {
+    public QuestionDto viewQuestion(Long id) {
         return queryFactory
                 .select(new QQuestionDto(
-                                question.title,
-                                question.writer,
-                                question.date,
-                                question.content,
-                                question.questionStatus,
-                                question.quCommentCount,
-                                question.answerCount))
+                        question.title,
+                        question.writer,
+                        question.date,
+                        question.content,
+                        question.questionStatus,
+                        question.quCommentCount,
+                        question.answerCount))
                 .from(question)
-                .join(question.questionHashtags, questionHashtag).fetchJoin()
-                .join(questionHashtag.hashtag, hashtag).fetchJoin()
-                .join(question.answers, answer).fetchJoin()
-                .join(answer.anComments, anComment).fetchJoin()
-                .join(question.quComments, quComment).fetchJoin()
-                .fetch();
+                .where(question.id.eq(id))
+                .fetchFirst();
     }
 
     @Override

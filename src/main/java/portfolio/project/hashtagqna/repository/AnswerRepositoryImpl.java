@@ -39,7 +39,6 @@ public class AnswerRepositoryImpl implements AnswerRepositoryCustom {
                         answer.rating
                         ))
                 .from(answer)
-                .join(answer.anComments, anComment)
                 .where(answer.question.id.eq(questionId))
                 .fetch();
     }

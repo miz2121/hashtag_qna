@@ -1,6 +1,7 @@
 package portfolio.project.hashtagqna.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.querydsl.jpa.impl.JPAUpdateClause;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.EntityManager;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,6 +10,7 @@ import portfolio.project.hashtagqna.dto.QAnCommentDto;
 import portfolio.project.hashtagqna.dto.QAnswerDto;
 import portfolio.project.hashtagqna.entity.Answer;
 import portfolio.project.hashtagqna.entity.AnswerStatus;
+import portfolio.project.hashtagqna.entity.Member;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,7 +39,7 @@ public class AnswerRepositoryImpl implements AnswerRepositoryCustom {
                         answer.answerStatus,
                         answer.anCommentCount,
                         answer.rating
-                        ))
+                ))
                 .from(answer)
                 .where(answer.question.id.eq(questionId))
                 .fetch();
@@ -56,6 +58,19 @@ public class AnswerRepositoryImpl implements AnswerRepositoryCustom {
         long execute = queryFactory
                 .delete(answer)
                 .where(answer.eq(rmAnswer))
+                .execute();
+        em.flush();
+        em.clear();
+        return execute;
+    }
+
+    @Override
+    @Transactional
+    public long updateNickname(Member oldMember, Member editedMember) {
+        long execute = queryFactory
+                .update(answer)
+                .set(answer.writer, editedMember.getNickname())
+                .where(answer.member.eq(oldMember))
                 .execute();
         em.flush();
         em.clear();

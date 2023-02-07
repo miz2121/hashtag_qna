@@ -1,11 +1,13 @@
 package portfolio.project.hashtagqna.repository;
 
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import org.springframework.transaction.annotation.Transactional;
 import portfolio.project.hashtagqna.dto.AnCommentDto;
 import portfolio.project.hashtagqna.dto.QAnCommentDto;
 import portfolio.project.hashtagqna.entity.AnComment;
+import portfolio.project.hashtagqna.entity.Member;
 import portfolio.project.hashtagqna.entity.Question;
 
 import java.util.List;
@@ -39,6 +41,19 @@ public class AnCommentRepositoryImpl implements AnCommentRepositoryCustom {
         long execute = queryFactory
                 .delete(anComment)
                 .where(anComment.eq(rmAnComment))
+                .execute();
+        em.flush();
+        em.clear();
+        return execute;
+    }
+
+    @Override
+    @Transactional
+    public long updateNickname(Member oldMember, Member editedMember) {
+        long execute = queryFactory
+                .update(anComment)
+                .set(anComment.writer, editedMember.getNickname())
+                .where(anComment.member.eq(oldMember))
                 .execute();
         em.flush();
         em.clear();

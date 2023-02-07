@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManager;
 import org.springframework.transaction.annotation.Transactional;
 import portfolio.project.hashtagqna.dto.QQuCommentDto;
 import portfolio.project.hashtagqna.dto.QuCommentDto;
+import portfolio.project.hashtagqna.entity.Member;
 import portfolio.project.hashtagqna.entity.QuComment;
 
 import java.util.List;
@@ -38,6 +39,19 @@ public class QuCommentRepositoryImpl implements QuCommentRepositoryCustom {
         long execute = queryFactory
                 .delete(quComment)
                 .where(quComment.eq(rmQuComment))
+                .execute();
+        em.flush();
+        em.clear();
+        return execute;
+    }
+
+    @Override
+    @Transactional
+    public long updateNickname(Member oldMember, Member editedMember) {
+        long execute = queryFactory
+                .update(quComment)
+                .set(quComment.writer, editedMember.getNickname())
+                .where(quComment.member.eq(oldMember))
                 .execute();
         em.flush();
         em.clear();

@@ -7,7 +7,7 @@ import portfolio.project.hashtagqna.dto.MemberInfoDto;
 import portfolio.project.hashtagqna.entity.Member;
 import portfolio.project.hashtagqna.exception.AlreadyExistEmailNicknameException;
 import portfolio.project.hashtagqna.exception.NotMemberException;
-import portfolio.project.hashtagqna.repository.MemberRepository;
+import portfolio.project.hashtagqna.repository.*;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -18,6 +18,10 @@ import java.util.Optional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final QuestionRepository questionRepository;
+    private final AnswerRepository answerRepository;
+    private final AnCommentRepository anCommentRepository;
+    private final QuCommentRepository quCommentRepository;
 
     public Member findMemberById(Long id){
         return memberRepository.findMemberById(id);
@@ -48,14 +52,19 @@ public class MemberService {
     }
 
     @Transactional
-    public long editMember(Member oldMember, Member editMember) {
-        String email = editMember.getEmail();
-        String nickname = editMember.getNickname();
+    public long editMember(Member oldMember, Member editedMember) {
+        String email = editedMember.getEmail();
+        String nickname = editedMember.getNickname();
         Optional<Long> alreadyExist = memberRepository.findByEmailNickname(email, nickname);
         if (alreadyExist.isPresent()) {
             throw new AlreadyExistEmailNicknameException("이메일 혹은 닉네임이 이미 존재합니다.");
         }
-        return memberRepository.editMember(oldMember, editMember);
+        memberRepository.editMember(oldMember, editedMember);
+        questionRepository.updateNickname(oldMember, editedMember);
+        answerRepository.updateNickname(oldMember, editedMember);
+        anCommentRepository.updateNickname(oldMember, editedMember);
+        quCommentRepository.updateNickname(oldMember, editedMember);
+        return editedMember.getId();
     }
 
     /**

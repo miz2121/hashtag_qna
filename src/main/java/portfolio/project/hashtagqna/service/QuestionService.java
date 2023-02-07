@@ -8,8 +8,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import portfolio.project.hashtagqna.dto.QuestionDto;
 import portfolio.project.hashtagqna.dto.QuestionListDto;
+import portfolio.project.hashtagqna.entity.Hashtag;
 import portfolio.project.hashtagqna.entity.Member;
 import portfolio.project.hashtagqna.entity.Question;
+import portfolio.project.hashtagqna.entity.QuestionHashtag;
+import portfolio.project.hashtagqna.repository.HashtagRepository;
+import portfolio.project.hashtagqna.repository.QuestionHashtagRepository;
 import portfolio.project.hashtagqna.repository.QuestionRepository;
 
 import java.util.List;
@@ -20,6 +24,8 @@ import java.util.List;
 public class QuestionService {
 
     private final QuestionRepository questionRepository;
+    private final HashtagRepository hashtagRepository;
+    private final QuestionHashtagRepository questionHashtagRepository;
 
     public List<QuestionListDto> viewFiveQuestions() {
         return questionRepository.viewFiveQuestions();
@@ -68,6 +74,28 @@ public class QuestionService {
     }
 
     @Transactional
+    public Long writeQuestion(Question question, List<Hashtag> hashtags, Member member) {
+        Question save = questionRepository.save(question);
+        save.addMember(member);
+        for (Hashtag ht : hashtags) {
+            hashtagRepository.save(ht);
+            ht.addMember(member);
+            QuestionHashtag createdQuestionHashtag = QuestionHashtag.builder()
+                    .question(question)
+                    .hashtag(ht)
+                    .build();
+            questionHashtagRepository.save(createdQuestionHashtag);
+            createdQuestionHashtag.addQuestionAndHashtag(question, ht);
+        }
+        return save.getId();
+    }
+
+    @Transactional
+    public long updateQuestion(Question oldQuestion, Question editedQuestion) {
+        return questionRepository.updateQuestion(oldQuestion, editedQuestion);
+    }
+
+    @Transactional
     public long removeQuestion(Question question) {
         return questionRepository.removeQuestion(question);
     }
@@ -96,7 +124,18 @@ public class QuestionService {
         return questionRepository.viewMyHashtags(pageable, member);
     }
 
-    public QuestionDto viewQuestion(Long id){
+    public QuestionDto viewQuestion(Long id) {
         return questionRepository.viewQuestion(id);
+    }
+
+    public Long makeQuestionClose(Long id) {
+        Question questionById = questionRepository.findQuestionById(id);
+        return questionById.closeQuestion();
+    }
+
+    public Page<QuestionListDto> viewQuestionsByOneHashtag(Pageable pageable, Hashtag ht) {
+        int page = (pageable.getPageNumber() == 0) ? 0 : (pageable.getPageNumber() - 1);  // page는 index처럼 0부터 시작
+        pageable = PageRequest.of(page, pageable.getPageSize());
+        return questionRepository.viewQuestionsByOneHashtag(pageable, ht);
     }
 }

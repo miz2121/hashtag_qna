@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import portfolio.project.hashtagqna.dto.*;
+import portfolio.project.hashtagqna.entity.Hashtag;
 import portfolio.project.hashtagqna.entity.Member;
 import portfolio.project.hashtagqna.entity.Question;
 
@@ -256,6 +257,21 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     }
 
     @Override
+    @Transactional
+    public long updateQuestion(Question oldQuestion, Question updatedQuestion) {
+        long execute = queryFactory
+                .update(question)
+                .set(question.date, updatedQuestion.getDate())
+                .set(question.content, updatedQuestion.getContent())
+                .set(question.title, updatedQuestion.getTitle())
+                .where(question.eq(oldQuestion))
+                .execute();
+        em.flush();
+        em.clear();
+        return execute;
+    }
+
+    @Override
     public Page<QuestionListDto> viewMyQuestions(Pageable pageable, Member member) {
         List<QuestionListDto> content = queryFactory
                 .select(new QQuestionListDto(
@@ -285,7 +301,6 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                         question.date))
                 .from(question)
                 .join(question.quComments, quComment).fetchJoin()
-                .join(question.answers, answer).fetchJoin()
                 .join(answer.anComments, anComment).fetchJoin()
                 .where(quComment.member.eq(member)
                         .or(anComment.member.eq(member)))
@@ -340,6 +355,42 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                 .from(question)
                 .fetchOne());
         return new PageImpl<>(content, pageable, total);
+    }
+
+    @Override
+    @Transactional
+    public long updateNickname(Member oldMember, Member editedMember) {
+        long execute = queryFactory
+                .update(question)
+                .set(question.writer, editedMember.getNickname())
+                .where(question.member.eq(oldMember))
+                .execute();
+        em.flush();
+        em.clear();
+        return execute;
+    }
+
+    @Override
+    public Page<QuestionListDto> viewQuestionsByOneHashtag(Pageable pageable, Hashtag ht) {
+        List<QuestionListDto> content = queryFactory
+                .select(new QQuestionListDto(
+                        question.writer,
+                        question.questionStatus,
+                        question.answerCount,
+                        question.date))
+                .from(question)
+                .join(question.questionHashtags, questionHashtag).fetchJoin()
+                .join(questionHashtag.hashtag, hashtag).fetchJoin()
+                .where(hashtag.eq(ht))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+        Integer total = Math.toIntExact(queryFactory
+                .select(question.count())
+                .from(question)
+                .fetchOne());
+        return new PageImpl<>(content, pageable, total);
+
     }
 
     private BooleanExpression titleCt(String text) {

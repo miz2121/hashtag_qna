@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import portfolio.project.hashtagqna.dto.QuestionDto;
 import portfolio.project.hashtagqna.dto.QuestionListDto;
+import portfolio.project.hashtagqna.entity.Hashtag;
 import portfolio.project.hashtagqna.entity.Member;
 import portfolio.project.hashtagqna.entity.Question;
 
@@ -30,6 +31,8 @@ public interface QuestionRepositoryCustom {
 
     public long removeQuestion(Question rmQuestion);
 
+    public long updateQuestion(Question oldQuestion, Question updatedQuestion);
+
     public Page<QuestionListDto> viewMyQuestions(Pageable pageable, Member member);
 
     public Page<QuestionListDto> viewMyComments(Pageable pageable, Member member);
@@ -37,4 +40,7 @@ public interface QuestionRepositoryCustom {
     public Page<QuestionListDto> viewMyAnswers(Pageable pageable, Member member);
 
     public Page<QuestionListDto> viewMyHashtags(Pageable pageable, Member member);
+
+    public long updateNickname(Member oldMember, Member editedMember);
+    public Page<QuestionListDto> viewQuestionsByOneHashtag(Pageable pageable, Hashtag ht);
 }

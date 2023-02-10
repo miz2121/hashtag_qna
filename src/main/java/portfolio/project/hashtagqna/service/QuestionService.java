@@ -12,6 +12,7 @@ import portfolio.project.hashtagqna.entity.Hashtag;
 import portfolio.project.hashtagqna.entity.Member;
 import portfolio.project.hashtagqna.entity.Question;
 import portfolio.project.hashtagqna.entity.QuestionHashtag;
+import portfolio.project.hashtagqna.exception.AuthorizationExeption;
 import portfolio.project.hashtagqna.repository.HashtagRepository;
 import portfolio.project.hashtagqna.repository.QuestionHashtagRepository;
 import portfolio.project.hashtagqna.repository.QuestionRepository;
@@ -74,12 +75,12 @@ public class QuestionService {
     }
 
     @Transactional
-    public Long writeQuestion(Question question, List<Hashtag> hashtags, Member member) {
+    public Long writeQuestion(Question question, Member questionWriter, Hashtag... hashtags) {
         Question save = questionRepository.save(question);
-        save.addMember(member);
+        save.addMember(questionWriter);
         for (Hashtag ht : hashtags) {
             hashtagRepository.save(ht);
-            ht.addMember(member);
+            ht.addMember(questionWriter);
             QuestionHashtag createdQuestionHashtag = QuestionHashtag.builder()
                     .question(question)
                     .hashtag(ht)
@@ -91,12 +92,18 @@ public class QuestionService {
     }
 
     @Transactional
-    public long updateQuestion(Question oldQuestion, Question editedQuestion) {
+    public long updateQuestion(Question oldQuestion, Question editedQuestion, Member questionWriter) {
+        if (oldQuestion.getMember() != questionWriter) {
+            throw new AuthorizationExeption("질문 작성자만이 질문을 수정할 수 있습니다.");
+        }
         return questionRepository.updateQuestion(oldQuestion, editedQuestion);
     }
 
     @Transactional
-    public long removeQuestion(Question question) {
+    public long removeQuestion(Question question, Member questionWriter) {
+        if (question.getMember() != questionWriter) {
+            throw new AuthorizationExeption("질문 작성자만이 질문을 삭제할 수 있습니다.");
+        }
         return questionRepository.removeQuestion(question);
     }
 
@@ -128,14 +135,13 @@ public class QuestionService {
         return questionRepository.viewQuestion(id);
     }
 
-    public Long makeQuestionClose(Long id) {
-        Question questionById = questionRepository.findQuestionById(id);
-        return questionById.closeQuestion();
-    }
-
     public Page<QuestionListDto> viewQuestionsByOneHashtag(Pageable pageable, Hashtag ht) {
         int page = (pageable.getPageNumber() == 0) ? 0 : (pageable.getPageNumber() - 1);  // page는 index처럼 0부터 시작
         pageable = PageRequest.of(page, pageable.getPageSize());
         return questionRepository.viewQuestionsByOneHashtag(pageable, ht);
+    }
+
+    public QuestionDto showQuestionById(Long id) {
+        return viewQuestion(id);
     }
 }

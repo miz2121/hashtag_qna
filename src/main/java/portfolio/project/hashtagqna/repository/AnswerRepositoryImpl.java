@@ -76,4 +76,11 @@ public class AnswerRepositoryImpl implements AnswerRepositoryCustom {
         em.clear();
         return execute;
     }
+
+    @Override
+    @Transactional
+    public Long makeAnswerSelected(Answer answer) {
+        answer.selectAnswer();
+        return answer.getId();
+    }
 }

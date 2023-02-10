@@ -50,7 +50,7 @@ public class Question extends BaseEntity{
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
-    @OneToMany(mappedBy = "question")
+    @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @ToString.Exclude
     private List<QuestionHashtag> questionHashtags = new ArrayList<>();
 

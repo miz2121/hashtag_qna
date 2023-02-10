@@ -10,4 +10,5 @@ public interface AnswerRepositoryCustom {
     public List<AnswerDto> viewAnswers(Long questionId);
     public long removeAnswer(Answer rmAnswer);
     public long updateNickname(Member oldMember, Member editedMember);
+    public Long makeAnswerSelected(Answer answer);
 }

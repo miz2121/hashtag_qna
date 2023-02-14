@@ -42,12 +42,13 @@ public class Hashtag extends BaseEntity{
      * 연관관계 편의 메소드
      * @param member
      */
-    public void addMember(Member member){
+    public Long addMember(Member member){
         if(this.member != null){
             this.member.getHashtags().remove(this);
         }
         this.member = member;
         member.getHashtags().add(this);
         member.increaseHashTagCount();
+        return getId();
     }
 }

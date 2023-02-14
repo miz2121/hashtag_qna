@@ -77,9 +77,9 @@ class MemberServiceTest {
 
         //then
         try {
-            normalLogin = memberService.login(normalMember);
-            oddLogin = memberService.login(oddMember);
-            oddPwdLogin = memberService.login(oddPwdMember);
+            normalLogin = memberService.logIn(normalMember);
+            oddLogin = memberService.logIn(oddMember);
+            oddPwdLogin = memberService.logIn(oddPwdMember);
         } catch (NotMemberException e) {
             printLog.printInfoLog("비정상 로그인");
         } finally {

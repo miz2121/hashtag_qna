@@ -57,4 +57,18 @@ public class QuCommentRepositoryImpl implements QuCommentRepositoryCustom {
         em.clear();
         return execute;
     }
+
+    @Override
+    @Transactional
+    public Long updateQuComment(QuComment oldQuComment, QuComment editedQuComment) {
+        long execute = queryFactory
+                .update(quComment)
+                .set(quComment.content, editedQuComment.getContent())
+                .set(quComment.date, editedQuComment.getDate())
+                .where(quComment.eq(oldQuComment))
+                .execute();
+        em.flush();
+        em.clear();
+        return execute;
+    }
 }

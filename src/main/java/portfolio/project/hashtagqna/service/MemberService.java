@@ -39,7 +39,7 @@ public class MemberService {
         return true;
     }
 
-    public boolean login(Member member) {
+    public boolean logIn(Member member) {
         Optional<Member> findMember = Optional.ofNullable(memberRepository.findMemberById(member.getId()));
         if (findMember.isEmpty()) {
             // 회원가입 한 적 없으면

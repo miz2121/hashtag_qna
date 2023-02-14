@@ -36,8 +36,9 @@ public class QuestionHashtag extends BaseEntity{
      * 연관관계 편의 메소드
      * @param question
      * @param hashtag
+     * @return questionHashtagId
      */
-    public void addQuestionAndHashtag(Question question, Hashtag hashtag){
+    public Long addQuestionAndHashtag(Question question, Hashtag hashtag){
         if(this.question != null){
             this.question.getQuestionHashtags().remove(this);
         }
@@ -49,5 +50,6 @@ public class QuestionHashtag extends BaseEntity{
         }
         this.hashtag = hashtag;
         hashtag.getQuestionHashtags().add(this);
+        return getId();
     }
 }

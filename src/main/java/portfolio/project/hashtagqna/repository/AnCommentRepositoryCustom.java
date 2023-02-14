@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface AnCommentRepositoryCustom {
     public long removeAnComment(AnComment rmAnComment);
-
     public List<AnCommentDto> viewAnComments(Long questionId);
     public long updateNickname(Member oldMember, Member editedMember);
+    public long updateAnComment(AnComment oldAnComment, AnComment editedAnComment);
 }

@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString
-public class Answer extends BaseEntity{
+public class Answer extends BaseEntity {
     @Id
     @GeneratedValue
     @Column(name = "ANSWER_ID")
@@ -57,6 +57,7 @@ public class Answer extends BaseEntity{
 
     /**
      * addQuestionAndMember(createdQuestion, answerWriter) 해 줘야 함.
+     *
      * @param content
      * @param question
      * @param member
@@ -71,39 +72,58 @@ public class Answer extends BaseEntity{
         this.answerStatus = AnswerStatus.UNSELECTED;
     }
 
-    public Long selectAnswer(){
+    public Long selectAnswer() {
         setAnswerStatus(AnswerStatus.SELECTED);
         return getId();
     }
 
-    public Long giveScore(int score){
+    public Long giveScore(ScoreStatus scoreStatus) {
+        int score = 0;
+        switch (scoreStatus) {
+            case SCORE1 -> score = 1;
+            case SCORE2 -> score = 2;
+            case SCORE3 -> score = 3;
+            case SCORE4 -> score = 4;
+            case SCORE5 -> score = 5;
+        }
         setRating(score);
         return getId();
     }
 
-    public Long increaseAnCommentCount(){
+    public Long increaseAnCommentCount() {
         setAnCommentCount(getAnCommentCount() + 1);
+        return getId();
+    }
+
+    public Long decreaseAnCommentCount() {
+        if (getAnCommentCount() - 1 < 0 ){
+            setAnCommentCount(0);
+        }else {
+            setAnCommentCount(getAnCommentCount() - 1);
+        }
         return getId();
     }
 
     /**
      * 연관관계 편의 메소드
+     *
      * @param question
      * @param answerWriter
      */
-    public void addQuestionAndMember(Question question, Member answerWriter){
-        if(this.question != null){
+    public Long addQuestionAndMember(Question question, Member answerWriter) {
+        if (this.question != null) {
             this.question.getAnswers().remove(this);
         }
         this.question = question;
         question.getAnswers().add(this);
         question.increaseAnswerCount();
 
-        if(this.member != null){
+        if (this.member != null) {
             this.member.getAnswers().remove(this);
         }
         this.member = answerWriter;
         member.getAnswers().add(this);
         member.increaseAnswerCount();
+        return getId();
     }
 }

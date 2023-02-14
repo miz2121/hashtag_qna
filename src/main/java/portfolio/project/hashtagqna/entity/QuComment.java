@@ -51,8 +51,9 @@ public class QuComment extends BaseEntity{
      * 연관관계 편의 메소드
      * @param question
      * @param commentWriter
+     * @return quCommentId
      */
-    public void addQuestionAndMember(Question question, Member commentWriter){
+    public Long addQuestionAndMember(Question question, Member commentWriter){
         if(this.question != null){
             this.question.getQuComments().remove(this);
         }
@@ -66,5 +67,6 @@ public class QuComment extends BaseEntity{
         this.member = commentWriter;
         member.getQuComments().add(this);
         member.increaseCommentCount();
+        return getId();
     }
 }

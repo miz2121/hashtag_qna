@@ -2,6 +2,7 @@ package portfolio.project.hashtagqna.repository;
 
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.querydsl.jpa.impl.JPAUpdateClause;
 import jakarta.persistence.EntityManager;
 import org.springframework.transaction.annotation.Transactional;
 import portfolio.project.hashtagqna.dto.AnCommentDto;
@@ -54,6 +55,20 @@ public class AnCommentRepositoryImpl implements AnCommentRepositoryCustom {
                 .update(anComment)
                 .set(anComment.writer, editedMember.getNickname())
                 .where(anComment.member.eq(oldMember))
+                .execute();
+        em.flush();
+        em.clear();
+        return execute;
+    }
+
+    @Override
+    @Transactional
+    public long updateAnComment(AnComment oldAnComment, AnComment editedAnComment) {
+        long execute = queryFactory
+                .update(anComment)
+                .set(anComment.content, editedAnComment.getContent())
+                .set(anComment.date, editedAnComment.getDate())
+                .where(anComment.eq(oldAnComment))
                 .execute();
         em.flush();
         em.clear();

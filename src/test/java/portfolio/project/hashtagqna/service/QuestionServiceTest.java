@@ -246,4 +246,54 @@ class QuestionServiceTest {
             System.out.println("questionListDtobyHashtag = " + questionListDtobyHashtag);
         }
     }
+
+    @Test
+    public void 질문을삭제하면멤버가가진질문갯수도줄어드는가() throws Exception {
+        //given
+        Member questionWriter = Member.builder()
+                .email("miz2121@naver.com")
+                .nickname("questionWriter")
+                .pwd("123")
+                .build();
+        memberService.signIn(questionWriter);
+        memberService.logIn(questionWriter);
+        Member answerWriter = Member.builder()
+                .email("miz1212@naver.com")
+                .nickname("answerWriter")
+                .pwd("123")
+                .build();
+        memberService.signIn(answerWriter);
+        memberService.logIn(answerWriter);
+        Question question = Question.builder()
+                .title("질문입니다.")
+                .content("질문의 내용입니다.")
+                .member(questionWriter)
+                .build();
+
+        Hashtag hashtag1 = Hashtag.builder()
+                .hashtagName("건강")
+                .member(questionWriter)
+                .build();
+        Hashtag hashtag2 = Hashtag.builder()
+                .hashtagName("운동")
+                .member(questionWriter)
+                .build();
+        Hashtag hashtag3 = Hashtag.builder()
+                .hashtagName("자전거")
+                .member(questionWriter)
+                .build();
+        questionService.writeQuestion(question, questionWriter, hashtag1, hashtag2, hashtag3);
+        Answer answer = Answer.builder()
+                .content("답변달겠습니다.")
+                .question(question)
+                .member(answerWriter)
+                .build();
+        answerService.addAnswer(question.getId(), answer, answerWriter);
+        //when & then
+        assertThat(questionWriter.getQuestionCount()).isEqualTo(1);
+        assertThat(questionWriter.getHashtagCount()).isEqualTo(3);
+        questionService.removeQuestion(question, questionWriter);
+        assertThat(questionWriter.getQuestionCount()).isEqualTo(0);
+        assertThat(questionWriter.getHashtagCount()).isEqualTo(0);
+    }
 }

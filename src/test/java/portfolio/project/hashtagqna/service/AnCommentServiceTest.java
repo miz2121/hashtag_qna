@@ -7,26 +7,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import portfolio.project.hashtagqna.entity.*;
-import portfolio.project.hashtagqna.logger.PrintLog;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class AnswerServiceTest {
+class AnCommentServiceTest {
     @Autowired
     EntityManager em;
     @Autowired
+    AnCommentService anCommentService;
+    @Autowired
     AnswerService answerService;
     @Autowired
-    MemberService memberService;
-    @Autowired
     QuestionService questionService;
-
-    private final PrintLog printLog = new PrintLog();
+    @Autowired
+    MemberService memberService;
 
     @Test
-    public void 채택기능() throws Exception {
+    public void 댓글등록수정삭제() throws Exception {
         //given
         Member questionWriter = Member.builder()
                 .email("login@naver.com")
@@ -38,10 +38,17 @@ class AnswerServiceTest {
                 .pwd("1234")
                 .nickname("answerWriter")
                 .build();
+        Member anCommentWriter = Member.builder()
+                .email("anComment@naver.com")
+                .pwd("1234")
+                .nickname("anCommentWriter")
+                .build();
         memberService.signIn(questionWriter);
         memberService.logIn(questionWriter);
         memberService.signIn(answerWriter);
         memberService.logIn(answerWriter);
+        memberService.signIn(anCommentWriter);
+        memberService.logIn(anCommentWriter);
         Question question = Question.builder()
                 .member(questionWriter)
                 .title("질문있습니다.")
@@ -57,12 +64,26 @@ class AnswerServiceTest {
                 .content("답변드리겠습니다.")
                 .member(questionWriter)
                 .build();
-        answerService.addAnswer(questionId, answer, answerWriter);
-        //when
-        answerService.giveAnswerScore(ScoreStatus.SCORE5, questionId, answer, questionWriter);
-        Long answerId = answerService.makeAnswerSelected(questionId, answer, questionWriter);
-        //then
-        assertThat(answer.getRating()).isEqualTo(5);
-        assertThat(answer.getAnswerStatus()).isEqualTo(AnswerStatus.SELECTED);
+        Long answerId = answerService.addAnswer(questionId, answer, answerWriter);
+        AnComment anComment = AnComment.builder()
+                .member(anCommentWriter)
+                .answer(answer)
+                .content("댓글 달겠습니다.")
+                .build();
+        Long anCommentId = anCommentService.addAnComment(answerId, anComment, anCommentWriter);
+
+        //when & then
+        assertThat(answer.getAnCommentCount()).isEqualTo(1);
+
+        AnComment editedAnComment = AnComment.builder()
+                .member(anCommentWriter)
+                .answer(answer)
+                .content("댓글 내용 수정하겠습니다.")
+                .build();
+        anCommentService.updateAnComment(anComment, editedAnComment, anCommentWriter);
+        assertThat(answer.getAnCommentCount()).isEqualTo(1);
+
+        anCommentService.removeAnComment(anComment, anCommentWriter);
+        assertThat(answer.getAnCommentCount()).isEqualTo(0);
     }
 }

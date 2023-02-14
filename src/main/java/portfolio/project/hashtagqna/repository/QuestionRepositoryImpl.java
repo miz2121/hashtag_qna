@@ -260,18 +260,24 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 //                .execute();
 //        em.flush();
 //        em.clear();
-//        queryFactory
-//                .delete(answer)
-//                .where(answer.question.eq(rmQuestion))
-//                .execute();
-//        em.flush();
-//        em.clear();
+        queryFactory
+                .delete(answer)
+                .where(answer.question.eq(rmQuestion))
+                .execute();
+        em.flush();
+        em.clear();
 //        queryFactory
 //                .delete(quComment)
 //                .where(quComment.question.eq(rmQuestion))
 //                .execute();
 //        em.flush();
 //        em.clear();
+        queryFactory
+                .delete(questionHashtag)
+                .where(questionHashtag.question.eq(rmQuestion))
+                .execute();
+        em.flush();
+        em.clear();
         long execute = queryFactory
                 .delete(question)
                 .where(question.eq(rmQuestion))

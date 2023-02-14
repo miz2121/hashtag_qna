@@ -50,7 +50,7 @@ public class Question extends BaseEntity{
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
-    @OneToMany(mappedBy = "question")
+    @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @ToString.Exclude
     private List<QuestionHashtag> questionHashtags = new ArrayList<>();
 
@@ -87,17 +87,41 @@ public class Question extends BaseEntity{
         return getId();
     }
 
+    public Long decreaseQuCommentCount() {
+        if (getQuCommentCount() - 1 < 0){
+            setQuCommentCount(0);
+        } else {
+            setQuCommentCount(getQuCommentCount() - 1);
+        }
+        return getId();
+    }
+
     public Long increaseAnswerCount(){
         setAnswerCount(getAnswerCount() + 1);
         return getId();
     }
 
-    public void addMember(Member questionWriter){
+    public Long decreaseAnswerCount() {
+        if (getAnswerCount() - 1 < 0 ){
+            setAnswerCount(0);
+        }else {
+            setAnswerCount(getAnswerCount() - 1);
+        }
+        return getId();
+    }
+
+    /**
+     * 연관관계 편의 메소드
+     * @param questionWriter
+     * @return QuestionId
+     */
+    public Long addMember(Member questionWriter){
         if(this.member != null){
             this.member.getQuestions().remove(this);
         }
         this.member = questionWriter;
         member.getQuestions().add(this);
         member.increaseQuestionCount();
+        return getId();
     }
 }

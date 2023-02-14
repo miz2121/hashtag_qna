@@ -23,7 +23,7 @@ public class Hashtag extends BaseEntity{
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
-    @OneToMany(mappedBy = "hashtag")
+    @OneToMany(mappedBy = "hashtag", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @ToString.Exclude
     private List<QuestionHashtag> questionHashtags = new ArrayList<>();
 
@@ -42,12 +42,13 @@ public class Hashtag extends BaseEntity{
      * 연관관계 편의 메소드
      * @param member
      */
-    public void addMember(Member member){
+    public Long addMember(Member member){
         if(this.member != null){
             this.member.getHashtags().remove(this);
         }
         this.member = member;
         member.getHashtags().add(this);
         member.increaseHashTagCount();
+        return getId();
     }
 }

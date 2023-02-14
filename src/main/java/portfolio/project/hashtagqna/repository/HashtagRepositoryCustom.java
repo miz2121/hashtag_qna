@@ -7,9 +7,9 @@ import portfolio.project.hashtagqna.entity.Member;
 import java.util.List;
 
 public interface HashtagRepositoryCustom {
-    public List<HashtagDto> findAllHashtags();
+    public List<HashtagDto> viewAllHashtags();
 
-    public List<HashtagDto> findAllSelectedHashtagsByHashtagNames(String... hashtagNames);
+    public List<HashtagDto> findAllSelectedHashtags(List<Hashtag> hashtags);
 
-    public List<HashtagDto> findMyAllHashtags(Member member);
+    public List<HashtagDto> viewMyAllHashtags(Member member);
 }

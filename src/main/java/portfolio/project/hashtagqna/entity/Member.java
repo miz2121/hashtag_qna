@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString
-public class Member extends BaseEntity{
+public class Member extends BaseEntity {
     @Id
     @GeneratedValue
     @Column(name = "MEMBER_ID")
@@ -81,27 +81,63 @@ public class Member extends BaseEntity{
         this.status = MemberStatus.ACTIVE;
     }
 
-    public Long increaseQuestionCount(){
+    public Long increaseQuestionCount() {
         setQuestionCount(getQuestionCount() + 1);
         return getId();
     }
 
-    public Long increaseAnswerCount(){
+    public Long decreaseQuestionCount() {
+        if (getQuestionCount() - 1 < 0) {
+            setQuestionCount(0);
+        } else {
+            setQuestionCount(getQuestionCount() - 1);
+        }
+        return getId();
+    }
+
+    public Long increaseAnswerCount() {
         setAnswerCount(getAnswerCount() + 1);
         return getId();
     }
 
-    public Long increaseHashTagCount(){
+    public Long decreaseAnswerCount() {
+        if (getQuestionCount() - 1 < 0) {
+            setQuestionCount(0);
+        } else {
+            setQuestionCount(getQuestionCount() - 1);
+        }
+        return getId();
+    }
+
+    public Long increaseHashTagCount() {
         setHashtagCount(getHashtagCount() + 1);
         return getId();
     }
 
-    public Long increaseCommentCount(){
+    public Long decreaseHashTagCount() {
+        if (getHashtagCount() - 1 < 0) {
+            setHashtagCount(0);
+        } else {
+            setHashtagCount(getHashtagCount() - 1);
+        }
+        return getId();
+    }
+
+    public Long increaseCommentCount() {
         setCommentCount(getCommentCount() + 1);
         return getId();
     }
 
-    public String getInactiveMessage(){
+    public Long decreaseCommentCount() {
+        if (getCommentCount() - 1 < 0 ){
+            setCommentCount(0);
+        }else{
+            setCommentCount(getCommentCount() - 1);
+        }
+        return getId();
+    }
+
+    public String getInactiveMessage() {
         return "탈퇴한 회원의 정보입니다.";
     }
 }

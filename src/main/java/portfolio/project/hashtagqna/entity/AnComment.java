@@ -51,8 +51,9 @@ public class AnComment extends BaseEntity{
      * 연관관계 편의 메소드
      * @param answer
      * @param commentWriter
+     * @return anCommentId
      */
-    public void addAnswerAndMember(Answer answer, Member commentWriter){
+    public Long addAnswerAndMember(Answer answer, Member commentWriter){
         if(this.answer != null){
             this.answer.getAnComments().remove(this);
         }
@@ -66,5 +67,6 @@ public class AnComment extends BaseEntity{
         this.member = commentWriter;
         member.getAnComments().add(this);
         member.increaseCommentCount();
+        return getId();
     }
 }

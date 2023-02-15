@@ -10,7 +10,7 @@ import java.util.List;
 public interface AnswerRepositoryCustom {
     public List<AnswerDto> viewAnswers(Long questionId);
     public long removeAnswer(Answer rmAnswer);
-    public long updateNickname(Member oldMember, Member editedMember);
+    public long updateNickname(Long oldMemberId, Member editedMember);
     public Long makeAnswerSelected(Answer answer);
     public Long giveAnswerScore(Answer answer, ScoreStatus scoreStatus);
     public long updateAnswer(Answer oldAnswer, Answer editedAnswer);

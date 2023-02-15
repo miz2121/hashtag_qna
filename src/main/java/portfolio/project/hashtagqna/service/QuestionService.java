@@ -71,6 +71,12 @@ public class QuestionService {
         return questionRepository.searchForAllPagingOrdering(text, pageable);
     }
 
+    /**
+     * @param question
+     * @param questionWriter
+     * @param hashtags
+     * @return questionId
+     */
     @Transactional
     public Long writeQuestion(Question question, Member questionWriter, Hashtag... hashtags) {
         Question save = questionRepository.save(question);
@@ -154,5 +160,9 @@ public class QuestionService {
 
     public QuestionDto showQuestionById(Long id) {
         return viewQuestion(id);
+    }
+
+    public Question findQuestionById(Long id) {
+        return questionRepository.findQuestionById(id);
     }
 }

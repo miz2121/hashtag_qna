@@ -31,7 +31,7 @@ public class MemberService {
     public boolean signIn(Member member) {
         String email = member.getEmail();
         String nickname = member.getNickname();
-        Optional<Long> alreadyExist = memberRepository.findByEmailNickname(email, nickname);
+        Optional<Long> alreadyExist = Optional.ofNullable(memberRepository.findByEmailNickname(email, nickname));
         if (alreadyExist.isPresent()) {
             throw new AlreadyExistEmailNicknameException("이메일 혹은 닉네임이 이미 존재합니다.");
         }
@@ -39,32 +39,28 @@ public class MemberService {
         return true;
     }
 
-    public boolean logIn(Member member) {
-        Optional<Member> findMember = Optional.ofNullable(memberRepository.findMemberById(member.getId()));
+    public boolean logIn(String email, String pwd) {
+        Optional<Long> findMember = Optional.ofNullable(memberRepository.findMemberByEmailPwd(email, pwd));
         if (findMember.isEmpty()) {
-            // 회원가입 한 적 없으면
             throw new NotMemberException("등록된 회원 정보가 없습니다.");
-        } else if (!(Objects.equals(findMember.get().getEmail(), member.getEmail())) && (Objects.equals(findMember.get().getPwd(), member.getPwd()))) {
-            // 이메일과 비밀번호가 맞지 않으면
-            throw new NotMemberException("이메일 또는 비밀번호가 일치하지 않습니다.");
         }
         return true;
     }
 
     @Transactional
-    public long editMember(Member oldMember, Member editedMember) {
+    public long editMember(Long oldMemberId, Member editedMember) {
         String email = editedMember.getEmail();
         String nickname = editedMember.getNickname();
-        Optional<Long> alreadyExist = memberRepository.findByEmailNickname(email, nickname);
+        Optional<Long> alreadyExist = Optional.ofNullable(memberRepository.findByEmailNickname(email, nickname));
         if (alreadyExist.isPresent()) {
             throw new AlreadyExistEmailNicknameException("이메일 혹은 닉네임이 이미 존재합니다.");
         }
-        memberRepository.editMember(oldMember, editedMember);
-        questionRepository.updateNickname(oldMember, editedMember);
-        answerRepository.updateNickname(oldMember, editedMember);
-        anCommentRepository.updateNickname(oldMember, editedMember);
-        quCommentRepository.updateNickname(oldMember, editedMember);
-        return editedMember.getId();
+        memberRepository.editMember(oldMemberId, editedMember);
+        questionRepository.updateNickname(oldMemberId, editedMember);
+        answerRepository.updateNickname(oldMemberId, editedMember);
+        anCommentRepository.updateNickname(oldMemberId, editedMember);
+        quCommentRepository.updateNickname(oldMemberId, editedMember);
+        return oldMemberId;
     }
 
     /**
@@ -74,11 +70,11 @@ public class MemberService {
      * @return
      */
     @Transactional
-    public long signOut(Member member) {
-        return memberRepository.makeInactiveMember(member);
+    public long signOut(Long id) {
+        return memberRepository.makeInactiveMember(id);
     }
 
-    public MemberInfoDto viewInfo(Member member) {
-        return memberRepository.viewMemberInfo(member);
+    public MemberInfoDto viewInfo(Long id) {
+        return memberRepository.viewMemberInfo(id);
     }
 }

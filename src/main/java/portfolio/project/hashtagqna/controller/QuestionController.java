@@ -42,9 +42,10 @@ public class QuestionController {
                 .member(questionWriter)
                 .build();
         questionService.writeQuestion(question, questionWriter);
-//        HttpHeaders header = new HttpHeaders();
-//        header.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
-        return new ResponseEntity<>(HttpStatus.OK);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Location", "/questions/{questionid}");  // redirect
+        return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
     @GetMapping("/questions/{questionid}")
@@ -54,9 +55,8 @@ public class QuestionController {
     }
 
     @GetMapping("/questions")
-    public ResponseEntity<Page<QuestionListDto>> viewQuestions(@PageableDefault(
-            size = 10
-    ) Pageable pageable) {
+    public ResponseEntity<Page<QuestionListDto>> viewQuestions(
+            @PageableDefault(size = 10) Pageable pageable) {
         Page<QuestionListDto> questionListDtos = questionService.viewQuestionsPagingOrdering(pageable);
         return new ResponseEntity<>(questionListDtos, HttpStatus.OK);
     }

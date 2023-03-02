@@ -31,7 +31,10 @@ public class MemberController {
                 .nickname(memberDto.getNickname())
                 .build();
         memberService.signIn(member);
-        return new ResponseEntity<>(HttpStatus.OK);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Location", "/login");  // redirect
+        return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
     @PostMapping("/login")
@@ -39,7 +42,10 @@ public class MemberController {
             Authentication authentication) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         memberService.logIn(principal.getUsername(), principal.getPassword());
-        return new ResponseEntity<>(HttpStatus.OK);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Location", "/home");  // redirect
+        return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
     @GetMapping("/members/{id}")
@@ -56,10 +62,6 @@ public class MemberController {
         memberInfoDto.setCommentCount(principal.getMember().getCommentCount());
         memberInfoDto.setHashtagCount(principal.getMember().getHashtagCount());
 
-//        MemberInfoDto memberInfoDto = memberService.viewInfo(id);
-//        HttpHeaders header = new HttpHeaders();
-//        header.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
-//        return new ResponseEntity<>(memberInfoDto, header, HttpStatus.OK);
         return new ResponseEntity<>(memberInfoDto, HttpStatus.OK);
     }
 
@@ -71,12 +73,18 @@ public class MemberController {
                 .nickname(memberDto.getNickname())
                 .build();
         memberService.editMember(id, editedMember);
-        return new ResponseEntity<>(HttpStatus.OK);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Location", "/home");  // redirect
+        return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
     @PutMapping("/members/inactive/{id}")
     public ResponseEntity<Object> signOut(@PathVariable Long id) {
         memberService.signOut(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Location", "/home");  // redirect
+        return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 }

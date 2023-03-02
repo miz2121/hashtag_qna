@@ -1,6 +1,9 @@
 package portfolio.project.hashtagqna.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -17,6 +20,9 @@ import portfolio.project.hashtagqna.repository.MemberRepository;
 import portfolio.project.hashtagqna.service.AnswerService;
 import portfolio.project.hashtagqna.service.MemberService;
 import portfolio.project.hashtagqna.service.QuestionService;
+
+import java.io.IOException;
+import java.net.URI;
 
 @Controller
 @RequiredArgsConstructor
@@ -40,7 +46,11 @@ public class AnswerController {
                 .member(answerWriter)
                 .build();
         answerService.addAnswer(questionid, answer, answerWriter);
-//        return "redirect:/questions/{questionid}";
-        return new ResponseEntity<>(HttpStatus.OK);
+
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Location", "/questions/{questionid}");  // redirect
+        return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 }
+

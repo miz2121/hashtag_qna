@@ -1,13 +1,16 @@
 spring:
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
   profiles:
     include: h2setting
   mvc:
+    view:
+      prefix: /WEB-INF/jsp/
+      suffix: .jsp
     hiddenmethod:
       filter:
         enabled: true

@@ -7,11 +7,13 @@ import java.util.Optional;
 
 public interface MemberRepositoryCustom {
 
-    public long editMember(Member oldMember, Member edMember);
+    public long editMember(Long oldMemberId, Member edMember);
 
-    public MemberInfoDto viewMemberInfo(Member viewMember);
+    public MemberInfoDto viewMemberInfo(Long id);
 
-    public Long makeInactiveMember(Member deleteMember);
+    public Long makeInactiveMember(Long id);
 
-    public Optional<Long> findByEmailNickname(String email, String nickname);
+    public Long findByEmailNickname(String email, String nickname);
+
+    public Long findMemberByEmailPwd(String email, String pwd);
 }

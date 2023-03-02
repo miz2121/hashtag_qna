@@ -107,7 +107,7 @@ class MemberServiceTest {
         Member editMember;
 
         try {
-            memberService.editMember(normalMember, oddEdit);
+            memberService.editMember(normalMember.getId(), oddEdit);
         } catch (AlreadyExistEmailNicknameException e) {
             printLog.printInfoLog("이미 존재하여 수정 불가능");
         } finally {
@@ -116,7 +116,7 @@ class MemberServiceTest {
                     .pwd("editPwd")
                     .nickname("editMember")
                     .build();
-            long l = memberService.editMember(normalMember, editMember);
+            long l = memberService.editMember(normalMember.getId(), editMember);
             Member findMember = memberService.findMemberById(l);
             assertThat(findMember.getEmail()).isEqualTo("edit@naver.com");
             assertThat(findMember.getPwd()).isEqualTo("editPwd");
@@ -140,7 +140,7 @@ class MemberServiceTest {
                 .build();
         boolean b = memberService.signIn(normalMember);
         //when
-        long l = memberService.signOut(normalMember);
+        long l = memberService.signOut(normalMember.getId());
         Member findMember = memberService.findMemberById(l);
         //then
         assertThat(findMember.getStatus()).isEqualTo(MemberStatus.INACTIVE);

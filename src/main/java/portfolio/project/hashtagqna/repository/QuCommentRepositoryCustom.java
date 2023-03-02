@@ -9,6 +9,6 @@ import java.util.List;
 public interface QuCommentRepositoryCustom {
     public List<QuCommentDto> viewQuComments(Long questionId);
     public long removeQuComment(QuComment rmQuComment);
-    public long updateNickname(Member oldMember, Member editedMember);
+    public long updateNickname(Long oldMemberId, Member editedMember);
     public Long updateQuComment(QuComment oldQuComment, QuComment editedQuComment);
 }

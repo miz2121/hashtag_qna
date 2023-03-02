@@ -44,11 +44,11 @@ class AnCommentServiceTest {
                 .nickname("anCommentWriter")
                 .build();
         memberService.signIn(questionWriter);
-        memberService.logIn(questionWriter);
+        memberService.logIn(questionWriter.getEmail(), questionWriter.getPwd());
         memberService.signIn(answerWriter);
-        memberService.logIn(answerWriter);
+        memberService.logIn(answerWriter.getEmail(), questionWriter.getPwd());
         memberService.signIn(anCommentWriter);
-        memberService.logIn(anCommentWriter);
+        memberService.logIn(anCommentWriter.getEmail(), questionWriter.getPwd());
         Question question = Question.builder()
                 .member(questionWriter)
                 .title("질문있습니다.")

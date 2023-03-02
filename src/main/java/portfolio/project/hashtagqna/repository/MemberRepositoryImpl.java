@@ -1,5 +1,6 @@
 package portfolio.project.hashtagqna.repository;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
@@ -14,6 +15,7 @@ import portfolio.project.hashtagqna.entity.MemberStatus;
 import java.util.List;
 import java.util.Optional;
 
+import static org.springframework.util.StringUtils.hasText;
 import static portfolio.project.hashtagqna.entity.QAnComment.anComment;
 import static portfolio.project.hashtagqna.entity.QAnswer.answer;
 import static portfolio.project.hashtagqna.entity.QQuComment.quComment;
@@ -32,13 +34,13 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
 
     @Transactional
     @Override
-    public long editMember(Member oldMember, Member edMember) {
+    public long editMember(Long oldMemberId, Member edMember) {
         long execute = queryFactory
                 .update(member)
                 .set(member.email, edMember.getEmail())
                 .set(member.pwd, edMember.getPwd())
                 .set(member.nickname, edMember.getNickname())
-                .where(member.eq(oldMember))
+                .where(member.id.eq(oldMemberId))
                 .execute();
         em.flush();
         em.clear();
@@ -46,7 +48,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
     }
 
     @Override
-    public MemberInfoDto viewMemberInfo(Member viewMember) {
+    public MemberInfoDto viewMemberInfo(Long id) {
         return queryFactory
                 .select(new QMemberInfoDto(
                         member.nickname,
@@ -57,18 +59,18 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                         member.hashtagCount
                 ))
                 .from(member)
-                .where(member.eq(viewMember))
+                .where(member.id.eq(id))
                 .fetchFirst();
     }
 
     @Transactional
     @Override
-    public Long makeInactiveMember(Member deleteMember) {
+    public Long makeInactiveMember(Long id) {
         String message = "탈퇴한 회원의 정보입니다.";
         queryFactory
                 .update(member)
                 .set(member.status, MemberStatus.INACTIVE)
-                .where(member.eq(deleteMember))
+                .where(member.id.eq(id))
                 .execute();
         em.flush();
         em.clear();
@@ -77,7 +79,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                 .set(question.title, message)
                 .set(question.content, message)
                 .set(question.writer, message)
-                .where(question.member.eq(deleteMember))
+                .where(question.member.id.eq(id))
                 .execute();
         em.flush();
         em.clear();
@@ -85,7 +87,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                 .update(answer)
                 .set(answer.content, message)
                 .set(answer.writer, message)
-                .where(answer.member.eq(deleteMember))
+                .where(answer.member.id.eq(id))
                 .execute();
         em.flush();
         em.clear();
@@ -93,7 +95,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                 .update(anComment)
                 .set(anComment.content, message)
                 .set(anComment.writer, message)
-                .where(anComment.member.eq(deleteMember))
+                .where(anComment.member.id.eq(id))
                 .execute();
         em.flush();
         em.clear();
@@ -101,27 +103,49 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                 .update(quComment)
                 .set(quComment.content, message)
                 .set(quComment.writer, message)
-                .where(quComment.member.eq(deleteMember))
+                .where(quComment.member.id.eq(id))
                 .execute();
         em.flush();
         em.clear();
         // 위 5개 update 문을 하나로 합치고 싶다...
-        return deleteMember.getId();
+        return id;
     }
 
-    public Optional<Long> findByEmailNickname(String email, String nickname){
-        return Optional.ofNullable(queryFactory
+    @Override
+    public Long findByEmailNickname(String email, String nickname) {
+        return queryFactory
                 .select(member.id)
                 .from(member)
-                .where(memberEmailEq(email).or(memberNicknameEq(nickname)))
-                .fetchFirst());
+                .where(memberEmailOrNicknameEq(email, nickname))
+                .fetchFirst();
+    }
+
+    @Override
+    public Long findMemberByEmailPwd(String email, String pwd) {
+        return queryFactory
+                .select(member.id)
+                .from(member)
+                .where(memberEmailEq(email), memberPwdEq(pwd))
+                .fetchFirst();
     }
 
     private BooleanExpression memberEmailEq(String emailCond) {
         return emailCond != null ? member.email.eq(emailCond) : null;
     }
 
-    private BooleanExpression memberNicknameEq(String nickname) {
-        return nickname != null ? member.nickname.eq(nickname) : null;
+    private BooleanExpression memberPwdEq(String pwdCond) {
+        return pwdCond != null ? member.pwd.eq(pwdCond) : null;
+    }
+
+    private BooleanBuilder memberEmailOrNicknameEq(String emailCond, String nicknameCond) {
+//        return emailCond != null ? member.email.eq(emailCond) : null;
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+        if (hasText(emailCond)) {
+            booleanBuilder.or(member.email.eq(emailCond));
+        }
+        if (hasText(nicknameCond)) {
+            booleanBuilder.or(member.nickname.eq(nicknameCond));
+        }
+        return booleanBuilder;
     }
 }

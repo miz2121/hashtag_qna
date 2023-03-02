@@ -16,4 +16,6 @@ public interface MemberRepositoryCustom {
     public Long findByEmailNickname(String email, String nickname);
 
     public Long findMemberByEmailPwd(String email, String pwd);
+
+    public Member findMemberByEmail(String email);
 }

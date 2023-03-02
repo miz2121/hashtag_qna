@@ -9,8 +9,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import portfolio.project.hashtagqna.config.auth.PrincipalDetails;
 import portfolio.project.hashtagqna.dto.CreateQuestionDto;
 import portfolio.project.hashtagqna.dto.QuestionDto;
 import portfolio.project.hashtagqna.dto.QuestionListDto;
@@ -28,8 +30,12 @@ public class QuestionController {
     private final MemberService memberService;
 
     @PostMapping("/{memberid}/questions")
-    public ResponseEntity<Object> createQuestion(@PathVariable Long memberid, @RequestBody CreateQuestionDto createQuestionDto) {
-        Member questionWriter = memberService.findMemberById(memberid);
+    public ResponseEntity<Object> createQuestion(
+            Authentication authentication,
+            @RequestBody CreateQuestionDto createQuestionDto) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        Member questionWriter = memberService.findMemberById((principal.getMember().getId()));
+
         Question question = Question.builder()
                 .title(createQuestionDto.getTitle())
                 .content(createQuestionDto.getContent())
@@ -124,44 +130,40 @@ public class QuestionController {
 
     @GetMapping("/questions/myQuestions/{memberid}")
     public ResponseEntity<Page<QuestionListDto>> viewMyQuestions(
-            @PathVariable Long memberid,
-            @PageableDefault(
-                    size = 10
-            ) Pageable pageable) {
-        Member member = memberService.findMemberById(memberid);
+            Authentication authentication,
+            @PageableDefault(size = 10) Pageable pageable) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        Member member = memberService.findMemberById(principal.getMember().getId());
         Page<QuestionListDto> questionListDtos = questionService.viewMyQuestions(pageable, member);
         return new ResponseEntity<>(questionListDtos, HttpStatus.OK);
     }
 
     @GetMapping("/questions/MyComments/{memberid}")
     public ResponseEntity<Page<QuestionListDto>> viewMyComments(
-            @PathVariable Long memberid,
-            @PageableDefault(
-                    size = 10
-            ) Pageable pageable) {
-        Member member = memberService.findMemberById(memberid);
+            Authentication authentication,
+            @PageableDefault(size = 10) Pageable pageable) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        Member member = memberService.findMemberById(principal.getMember().getId());
         Page<QuestionListDto> questionListDtos = questionService.viewMyComments(pageable, member);
         return new ResponseEntity<>(questionListDtos, HttpStatus.OK);
     }
 
     @GetMapping("/questions/MyAnswers/{memberid}")
     public ResponseEntity<Page<QuestionListDto>> viewMyAnswers(
-            @PathVariable Long memberid,
-            @PageableDefault(
-                    size = 10
-            ) Pageable pageable) {
-        Member member = memberService.findMemberById(memberid);
+            Authentication authentication,
+            @PageableDefault(size = 10) Pageable pageable) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        Member member = memberService.findMemberById(principal.getMember().getId());
         Page<QuestionListDto> questionListDtos = questionService.viewMyAnswers(pageable, member);
         return new ResponseEntity<>(questionListDtos, HttpStatus.OK);
     }
 
     @GetMapping("/questions/MyHashtags/{memberid}")
     public ResponseEntity<Page<QuestionListDto>> viewMyHashtags(
-            @PathVariable Long memberid,
-            @PageableDefault(
-                    size = 10
-            ) Pageable pageable) {
-        Member member = memberService.findMemberById(memberid);
+            Authentication authentication,
+            @PageableDefault(size = 10) Pageable pageable) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        Member member = memberService.findMemberById(principal.getMember().getId());
         Page<QuestionListDto> questionListDtos = questionService.viewMyHashtags(pageable, member);
         return new ResponseEntity<>(questionListDtos, HttpStatus.OK);
     }

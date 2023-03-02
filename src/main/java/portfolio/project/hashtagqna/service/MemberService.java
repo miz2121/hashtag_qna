@@ -66,7 +66,7 @@ public class MemberService {
     /**
      * 회원 탈퇴 후 동일 이메일로는 재가입 불가능함을 알려야 함.
      *
-     * @param member
+     * @param id
      * @return
      */
     @Transactional

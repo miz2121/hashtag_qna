@@ -129,6 +129,14 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                 .fetchFirst();
     }
 
+    @Override
+    public Member findMemberByEmail(String email) {
+        return queryFactory
+                .selectFrom(member)
+                .where(memberEmailEq(email))
+                .fetchFirst();
+    }
+
     private BooleanExpression memberEmailEq(String emailCond) {
         return emailCond != null ? member.email.eq(emailCond) : null;
     }

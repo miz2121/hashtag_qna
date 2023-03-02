@@ -2,8 +2,11 @@ package portfolio.project.hashtagqna.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import portfolio.project.hashtagqna.config.auth.PrincipalDetails;
 import portfolio.project.hashtagqna.dto.HomeDto;
 import portfolio.project.hashtagqna.dto.MemberDto;
 import portfolio.project.hashtagqna.dto.MemberInfoDto;
@@ -17,12 +20,14 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @PostMapping("/join")
     public ResponseEntity<Object> join(@RequestBody MemberDto memberDto) {
+
         Member member = Member.builder()
                 .email(memberDto.getEmail())
-                .pwd(memberDto.getPwd())
+                .pwd(bCryptPasswordEncoder.encode(memberDto.getPwd()))
                 .nickname(memberDto.getNickname())
                 .build();
         memberService.signIn(member);
@@ -30,16 +35,28 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Object> login(@RequestBody String email, @RequestBody String pwd) {
-        memberService.logIn(email, pwd);
+    public ResponseEntity<Object> login(
+            Authentication authentication) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        memberService.logIn(principal.getUsername(), principal.getPassword());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/members/{id}")
     @ResponseBody
-    public ResponseEntity<MemberInfoDto> viewInfo(@PathVariable Long id) {
-        MemberInfoDto memberInfoDto = memberService.viewInfo(id);
+    public ResponseEntity<MemberInfoDto> viewInfo(
+            Authentication authentication) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        MemberInfoDto memberInfoDto = new MemberInfoDto();
 
+        memberInfoDto.setNickname(principal.getMember().getNickname());
+        memberInfoDto.setEmail(principal.getMember().getEmail());
+        memberInfoDto.setQuestionCount(principal.getMember().getQuestionCount());
+        memberInfoDto.setAnswerCount(principal.getMember().getAnswerCount());
+        memberInfoDto.setCommentCount(principal.getMember().getCommentCount());
+        memberInfoDto.setHashtagCount(principal.getMember().getHashtagCount());
+
+//        MemberInfoDto memberInfoDto = memberService.viewInfo(id);
 //        HttpHeaders header = new HttpHeaders();
 //        header.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 //        return new ResponseEntity<>(memberInfoDto, header, HttpStatus.OK);
@@ -50,7 +67,7 @@ public class MemberController {
     public ResponseEntity<Object> update(@PathVariable("id") Long id, @RequestBody MemberDto memberDto) {
         Member editedMember = Member.builder()
                 .email(memberDto.getEmail())
-                .pwd(memberDto.getPwd())
+                .pwd(bCryptPasswordEncoder.encode(memberDto.getPwd()))
                 .nickname(memberDto.getNickname())
                 .build();
         memberService.editMember(id, editedMember);

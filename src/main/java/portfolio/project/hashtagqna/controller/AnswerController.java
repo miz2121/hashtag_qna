@@ -15,17 +15,17 @@ import portfolio.project.hashtagqna.service.QuestionService;
 @Controller
 @RequiredArgsConstructor
 public class AnswerController {
-    private final AnswerService answerService;
-    private final QuestionService questionService;
-
-    @PostMapping("/questions/{questionid}/answers")
-    public ResponseEntity<Object> createAnswer( @PathVariable Long questionid, @RequestBody CreateAnswerDto createAnswerDto) {
-        Question question = questionService.findQuestionById(questionid);
-//        Answer answer = Answer.builder()
-//                .question(question)
-//                .content(createAnswerDto.getContent())
-//                .member()
-//                .build();
-//        answerService.addAnswer(questionid, answer, )
-    }
+//    private final AnswerService answerService;
+//    private final QuestionService questionService;
+//
+//    @PostMapping("/questions/{questionid}/answers")
+//    public ResponseEntity<Object> createAnswer( @PathVariable Long questionid, @RequestBody CreateAnswerDto createAnswerDto) {
+//        Question question = questionService.findQuestionById(questionid);
+////        Answer answer = Answer.builder()
+////                .question(question)
+////                .content(createAnswerDto.getContent())
+////                .member()
+////                .build();
+////        answerService.addAnswer(questionid, answer, )
+//    }
 }

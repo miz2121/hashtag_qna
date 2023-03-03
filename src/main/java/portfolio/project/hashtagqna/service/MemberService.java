@@ -9,7 +9,6 @@ import portfolio.project.hashtagqna.exception.AlreadyExistEmailNicknameException
 import portfolio.project.hashtagqna.exception.NotMemberException;
 import portfolio.project.hashtagqna.repository.*;
 
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -49,11 +48,10 @@ public class MemberService {
 
     @Transactional
     public long editMember(Long oldMemberId, Member editedMember) {
-        String email = editedMember.getEmail();
         String nickname = editedMember.getNickname();
-        Optional<Long> alreadyExist = Optional.ofNullable(memberRepository.findByEmailNickname(email, nickname));
+        Optional<Long> alreadyExist = Optional.ofNullable(memberRepository.findByNickname(nickname));
         if (alreadyExist.isPresent()) {
-            throw new AlreadyExistEmailNicknameException("이메일 혹은 닉네임이 이미 존재합니다.");
+            throw new AlreadyExistEmailNicknameException("닉네임이 이미 존재합니다.");
         }
         memberRepository.editMember(oldMemberId, editedMember);
         questionRepository.updateNickname(oldMemberId, editedMember);

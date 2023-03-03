@@ -7,14 +7,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import portfolio.project.hashtagqna.config.auth.PrincipalDetails;
-import portfolio.project.hashtagqna.dto.HomeDto;
 import portfolio.project.hashtagqna.dto.MemberDto;
 import portfolio.project.hashtagqna.dto.MemberInfoDto;
-import portfolio.project.hashtagqna.dto.MemberStatusDto;
 import portfolio.project.hashtagqna.entity.Member;
 import portfolio.project.hashtagqna.service.MemberService;
-
-import java.nio.charset.StandardCharsets;
 
 @Controller
 @RequiredArgsConstructor
@@ -42,6 +38,7 @@ public class MemberController {
     public ResponseEntity<Object> login(
             Authentication authentication) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+
         memberService.logIn(principal.getUsername(), principal.getPassword());
 
         HttpHeaders headers = new HttpHeaders();
@@ -50,7 +47,7 @@ public class MemberController {
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
-    @GetMapping("/members/{id}")
+    @GetMapping("/members")
     @ResponseBody
     public ResponseEntity<MemberInfoDto> viewInfo(
             Authentication authentication) {
@@ -67,15 +64,20 @@ public class MemberController {
         return new ResponseEntity<>(memberInfoDto, HttpStatus.OK);
     }
 
-    @PatchMapping("/members/{id}")
-    public ResponseEntity<Object> update(@PathVariable("id") Long id, @RequestBody MemberDto memberDto) {
+    @PatchMapping("/members")
+    public ResponseEntity<Object> edit(
+            Authentication authentication,
+            @RequestBody MemberDto memberDto) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        Member member = memberService.findMemberById(principal.getMember().getId());
+
         Member editedMember = Member.builder()
-                .email(memberDto.getEmail())
+                .email(member.getEmail())
                 .pwd(bCryptPasswordEncoder.encode(memberDto.getPwd()))
                 .nickname(memberDto.getNickname())
                 .build();
-        memberService.editMember(id, editedMember);
 
+        memberService.editMember(member.getId(), editedMember);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.add("Location", "/home");  // redirect
@@ -83,9 +85,12 @@ public class MemberController {
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
-    @PutMapping("/members/inactive/{id}")
-    public ResponseEntity<Object> signOut(@PathVariable Long id) {
-        memberService.signOut(id);
+    @PutMapping("/members/inactive")
+    public ResponseEntity<Object> signOut(Authentication authentication) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+
+        Member loginMember = memberService.findMemberById(principal.getMember().getId());
+        memberService.signOut(loginMember.getId());
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Location", "/home");  // redirect

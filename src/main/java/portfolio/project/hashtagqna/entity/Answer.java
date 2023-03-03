@@ -3,8 +3,6 @@ package portfolio.project.hashtagqna.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -77,16 +75,15 @@ public class Answer extends BaseEntity {
         return getId();
     }
 
-    public Long giveScore(ScoreStatus scoreStatus) {
-        int score = 0;
-        switch (scoreStatus) {
-            case SCORE1 -> score = 1;
-            case SCORE2 -> score = 2;
-            case SCORE3 -> score = 3;
-            case SCORE4 -> score = 4;
-            case SCORE5 -> score = 5;
+    public Long giveScore(String scoreString) {
+        int rat = getRating();
+        switch (scoreString) {
+            case "1" -> setRating(1);
+            case "2" -> setRating(2);
+            case "3" -> setRating(3);
+            case "4" -> setRating(4);
+            case "5" -> setRating(5);
         }
-        setRating(score);
         return getId();
     }
 
@@ -96,9 +93,9 @@ public class Answer extends BaseEntity {
     }
 
     public Long decreaseAnCommentCount() {
-        if (getAnCommentCount() - 1 < 0 ){
+        if (getAnCommentCount() - 1 < 0) {
             setAnCommentCount(0);
-        }else {
+        } else {
             setAnCommentCount(getAnCommentCount() - 1);
         }
         return getId();

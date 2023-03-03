@@ -9,7 +9,9 @@ import java.util.List;
 public interface HashtagRepositoryCustom {
     public List<HashtagDto> viewAllHashtags();
 
-    public List<HashtagDto> findAllSelectedHashtags(List<Hashtag> hashtags);
+    public List<HashtagDto> findAllSelectedHashtags(List<HashtagDto> hashtags);
 
     public List<HashtagDto> viewMyAllHashtags(Member member);
+
+    public List<HashtagDto> viewHashtagsAtQuestion(Long questionId);
 }

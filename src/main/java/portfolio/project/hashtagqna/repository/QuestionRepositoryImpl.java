@@ -95,7 +95,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                         question.answerCount,
                         question.date))
                 .from(question)
-                .where(questionWriterEq(text))
+                .where(questionWriterCt(text))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(question.date.desc())
@@ -119,7 +119,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                 .from(question)
                 .join(question.answers, answer)
                 .on(question.id.eq(answer.question.id))
-                .where(answerWriterEq(text))
+                .where(answerWriterCt(text))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(question.date.desc())
@@ -147,8 +147,8 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                 .on(question.id.eq(answer.question.id))
                 .join(answer.anComments, anComment)
                 .on(answer.id.eq(anComment.answer.id))
-                .where(quCommentWriterEq(text).
-                        or(anCommentWriterEq(text)))
+                .where(quCommentWriterCt(text).
+                        or(anCommentWriterCt(text)))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(question.date.desc())
@@ -230,10 +230,10 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                 .join(answer.anComments, anComment)
                 .on(answer.id.eq(anComment.answer.id))
                 .where(
-                        questionWriterEq(text)
-                                .or(answerWriterEq(text))
-                                .or(quCommentWriterEq(text))
-                                .or(anCommentWriterEq(text))
+                        questionWriterCt(text)
+                                .or(answerWriterCt(text))
+                                .or(quCommentWriterCt(text))
+                                .or(anCommentWriterCt(text))
                                 .or(titleCt(text))
                                 .or(questionContentCt(text))
                                 .or(answerContentCt(text))
@@ -437,39 +437,39 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     }
 
     private BooleanExpression titleCt(String text) {
-        return text != null ? question.title.contains(text) : null;
+        return text != null ? question.title.containsIgnoreCase(text) : null;
     }
 
     private BooleanExpression questionContentCt(String text) {
-        return text != null ? question.content.contains(text) : null;
+        return text != null ? question.content.containsIgnoreCase(text) : null;
     }
 
     private BooleanExpression answerContentCt(String text) {
-        return text != null ? answer.content.contains(text) : null;
+        return text != null ? answer.content.containsIgnoreCase(text) : null;
     }
 
     private BooleanExpression quCommentContentCt(String text) {
-        return text != null ? quComment.content.contains(text) : null;
+        return text != null ? quComment.content.containsIgnoreCase(text) : null;
     }
 
     private BooleanExpression anCommentContentCt(String text) {
-        return text != null ? anComment.content.contains(text) : null;
+        return text != null ? anComment.content.containsIgnoreCase(text) : null;
     }
 
-    private BooleanExpression questionWriterEq(String writer) {
-        return writer != null ? question.writer.eq(writer) : null;
+    private BooleanExpression questionWriterCt(String writer) {
+        return writer != null ? question.writer.containsIgnoreCase(writer) : null;
     }
 
-    private BooleanExpression answerWriterEq(String writer) {
-        return writer != null ? answer.writer.eq(writer) : null;
+    private BooleanExpression answerWriterCt(String writer) {
+        return writer != null ? answer.writer.containsIgnoreCase(writer) : null;
     }
 
-    private BooleanExpression quCommentWriterEq(String writer) {
-        return writer != null ? quComment.writer.eq(writer) : null;
+    private BooleanExpression quCommentWriterCt(String writer) {
+        return writer != null ? quComment.writer.containsIgnoreCase(writer) : null;
     }
 
-    private BooleanExpression anCommentWriterEq(String writer) {
-        return writer != null ? anComment.writer.eq(writer) : null;
+    private BooleanExpression anCommentWriterCt(String writer) {
+        return writer != null ? anComment.writer.containsIgnoreCase(writer) : null;
     }
 
 }

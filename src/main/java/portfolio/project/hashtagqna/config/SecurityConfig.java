@@ -30,7 +30,8 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests()
                 .requestMatchers("/members/**").authenticated()
-                .requestMatchers("/question/**").authenticated()
+                .requestMatchers("/questions/**").authenticated()
+                .requestMatchers("/", "/**").permitAll()
                 .anyRequest().permitAll();
         return http.build();
     }

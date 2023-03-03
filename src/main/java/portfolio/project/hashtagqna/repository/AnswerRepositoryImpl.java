@@ -11,7 +11,6 @@ import portfolio.project.hashtagqna.dto.QAnswerDto;
 import portfolio.project.hashtagqna.entity.Answer;
 import portfolio.project.hashtagqna.entity.AnswerStatus;
 import portfolio.project.hashtagqna.entity.Member;
-import portfolio.project.hashtagqna.entity.ScoreStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -76,20 +75,6 @@ public class AnswerRepositoryImpl implements AnswerRepositoryCustom {
         em.flush();
         em.clear();
         return execute;
-    }
-
-    @Override
-    @Transactional
-    public Long makeAnswerSelected(Answer answer) {
-        Long id = answer.selectAnswer();
-        return id;
-    }
-
-    @Override
-    @Transactional
-    public Long giveAnswerScore(Answer answer, ScoreStatus scoreStatus) {
-        Long id = answer.giveScore(scoreStatus);
-        return id;
     }
 
     @Override

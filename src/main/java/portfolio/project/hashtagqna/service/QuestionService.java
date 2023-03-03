@@ -6,14 +6,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import portfolio.project.hashtagqna.dto.HashtagDto;
 import portfolio.project.hashtagqna.dto.QuestionDto;
 import portfolio.project.hashtagqna.dto.QuestionListDto;
 import portfolio.project.hashtagqna.entity.*;
 import portfolio.project.hashtagqna.exception.AuthExeption;
-import portfolio.project.hashtagqna.repository.HashtagRepository;
-import portfolio.project.hashtagqna.repository.QuestionHashtagRepository;
-import portfolio.project.hashtagqna.repository.QuestionRepository;
+import portfolio.project.hashtagqna.repository.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -25,6 +25,9 @@ public class QuestionService {
     private final QuestionRepository questionRepository;
     private final HashtagRepository hashtagRepository;
     private final QuestionHashtagRepository questionHashtagRepository;
+    private final AnswerRepository answerRepository;
+    private final MemberRepository memberRepository;
+
 
     public List<QuestionListDto> viewFiveQuestions() {
         return questionRepository.viewFiveQuestions();
@@ -75,22 +78,46 @@ public class QuestionService {
     /**
      * @param question
      * @param questionWriter
-     * @param hashtags
-     * @return questionId
+     * @param existHashtagDtos
+     * @param newHashtagDtos
+     * @return
      */
     @Transactional
-    public Long writeQuestion(Question question, Member questionWriter, Hashtag... hashtags) {
+    public Long writeQuestion(Question question, Member questionWriter, List<HashtagDto> existHashtagDtos, List<HashtagDto> newHashtagDtos) {
         Question save = questionRepository.save(question);
         save.addMember(questionWriter);
-        for (Hashtag ht : hashtags) {
-            hashtagRepository.save(ht);
-            ht.addMember(questionWriter);
-            QuestionHashtag createdQuestionHashtag = QuestionHashtag.builder()
-                    .question(question)
-                    .hashtag(ht)
-                    .build();
-            questionHashtagRepository.save(createdQuestionHashtag);
-            createdQuestionHashtag.addQuestionAndHashtag(question, ht);
+
+        if (!existHashtagDtos.isEmpty()) {
+            List<HashtagDto> selectedHashtagsExist = hashtagRepository.findAllSelectedHashtags(existHashtagDtos);
+            for (HashtagDto hashtagDto : selectedHashtagsExist) {
+                Hashtag ht = Hashtag.builder()
+                        .hashtagName(hashtagDto.getHashtagName())
+                        .member(questionWriter)
+                        .build();
+                ht.addMember(questionWriter);
+                QuestionHashtag createdQuestionHashtag = QuestionHashtag.builder()
+                        .question(question)
+                        .hashtag(ht)
+                        .build();
+                questionHashtagRepository.save(createdQuestionHashtag);
+                createdQuestionHashtag.addQuestionAndHashtag(question, ht);
+            }
+        }
+        if (!newHashtagDtos.isEmpty()) {
+            for (HashtagDto newHashtagDto : newHashtagDtos) {
+                Hashtag ht = Hashtag.builder()
+                        .hashtagName(newHashtagDto.getHashtagName())
+                        .member(questionWriter)
+                        .build();
+                hashtagRepository.save(ht);
+                ht.addMember(questionWriter);
+                QuestionHashtag createdQuestionHashtag = QuestionHashtag.builder()
+                        .question(question)
+                        .hashtag(ht)
+                        .build();
+                questionHashtagRepository.save(createdQuestionHashtag);
+                createdQuestionHashtag.addQuestionAndHashtag(question, ht);
+            }
         }
         return save.getId();
     }
@@ -107,21 +134,24 @@ public class QuestionService {
     }
 
     @Transactional
-    public long removeQuestion(Question question, Member questionWriter) {
+    public long removeQuestion(Long questionId, Long loginMemberId) {
+        Question question = questionRepository.findQuestionById(questionId);
+        Member loginMember = memberRepository.findMemberById(loginMemberId);
         if (question.getQuestionStatus() == QuestionStatus.CLOSED) {
             throw new AuthExeption("닫힌 질문은 수정이나 삭제할 수 없습니다.");
         }
-        if (!Objects.equals(question.getMember().getId(), questionWriter.getId())) {
+        if (!Objects.equals(question.getMember().getId(), loginMemberId)) {
             throw new AuthExeption("질문 작성자만이 질문을 삭제할 수 있습니다.");
         }
 
         for (int i = 0; i < question.getQuestionHashtags().size(); i++) {
-            questionWriter.decreaseHashTagCount();
+            loginMember.decreaseHashTagCount();
         }
         for (Answer answer : question.getAnswers()) {
-            answer.getMember().decreaseAnswerCount();
+            Answer answerById = answerRepository.findAnswerById(answer.getId());
+            answerById.getMember().decreaseAnswerCount();
         }
-        questionWriter.decreaseQuestionCount();
+        loginMember.decreaseQuestionCount();
         return questionRepository.removeQuestion(question);
     }
 

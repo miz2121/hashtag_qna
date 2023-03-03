@@ -1,6 +1,7 @@
 package portfolio.project.hashtagqna.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -29,7 +30,7 @@ public class QuestionController {
     private final QuestionService questionService;
     private final MemberService memberService;
 
-    @PostMapping("/{memberid}/questions")
+    @PostMapping("/question")
     public ResponseEntity<Object> createQuestion(
             Authentication authentication,
             @RequestBody CreateQuestionDto createQuestionDto) {
@@ -44,6 +45,7 @@ public class QuestionController {
         questionService.writeQuestion(question, questionWriter);
 
         HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
         headers.add("Location", "/questions/{questionid}");  // redirect
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
@@ -166,5 +168,21 @@ public class QuestionController {
         Member member = memberService.findMemberById(principal.getMember().getId());
         Page<QuestionListDto> questionListDtos = questionService.viewMyHashtags(pageable, member);
         return new ResponseEntity<>(questionListDtos, HttpStatus.OK);
+    }
+
+    @PostMapping("/question/remove/{questionid}")
+    public ResponseEntity<Object> removeQuestion(
+            Authentication authentication,
+            @PathVariable Long questionid
+    ){
+        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        Member loginUser = principalDetails.getMember();
+        Question question = questionService.findQuestionById(questionid);
+        long l = questionService.removeQuestion(question, loginUser);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("Location", "/questions");  // redirect
+        return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 }

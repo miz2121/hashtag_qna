@@ -15,6 +15,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import portfolio.project.hashtagqna.config.auth.PrincipalDetails;
 import portfolio.project.hashtagqna.dto.MemberLoginDto;
+import portfolio.project.hashtagqna.logger.PrintLog;
 
 import java.io.IOException;
 import java.util.Date;
@@ -27,10 +28,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public Authentication attemptAuthentication(
             HttpServletRequest request,
             HttpServletResponse response) throws AuthenticationException {
+        PrintLog printLog = new PrintLog();
+        printLog.printInfoLog("JwtAuthenticationFilter is applied");
         ObjectMapper om = new ObjectMapper();
         MemberLoginDto memberLoginDto = null;
         try {
             memberLoginDto = om.readValue(request.getInputStream(), MemberLoginDto.class);
+            printLog.printInfoLog("memberLoginDto: "+memberLoginDto.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }

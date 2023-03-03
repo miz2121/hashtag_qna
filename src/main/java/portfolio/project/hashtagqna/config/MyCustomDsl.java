@@ -21,5 +21,6 @@ public class MyCustomDsl extends AbstractHttpConfigurer<MyCustomDsl, HttpSecurit
                 .addFilter(corsConfig.corsFilter())
                 .addFilter(new JwtAuthenticationFilter(authenticationManager))
                 .addFilter(new JwtAuthorizationFilter(authenticationManager, memberRepository));
+        System.out.println("MyCustomDsl is applied");
     }
 }

@@ -1,19 +1,15 @@
 package portfolio.project.hashtagqna.config.auth;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import portfolio.project.hashtagqna.entity.Member;
 
 import java.util.Collection;
 
-
+@RequiredArgsConstructor
 public class PrincipalDetails implements UserDetails {
-
-    private Member member;
-
-    public PrincipalDetails(Member member) {
-        this.member = member;
-    }
+    private final Member member;
 
     public Member getMember() {
         return member;

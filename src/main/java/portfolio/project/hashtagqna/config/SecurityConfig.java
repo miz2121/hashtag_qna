@@ -26,7 +26,12 @@ public class SecurityConfig {
                 .addFilter(corsConfig.corsFilter())
                 .formLogin().disable()
                 .httpBasic().disable()
-                .apply(new MyCustomDsl(corsConfig, memberRepository));
+                .apply(new MyCustomDsl(corsConfig, memberRepository))
+                .and()
+                .authorizeHttpRequests()
+                .requestMatchers("/members/**").authenticated()
+                .requestMatchers("/question/**").authenticated()
+                .anyRequest().permitAll();
         return http.build();
     }
 }

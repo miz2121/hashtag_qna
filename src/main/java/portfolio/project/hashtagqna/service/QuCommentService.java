@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import portfolio.project.hashtagqna.entity.Member;
 import portfolio.project.hashtagqna.entity.QuComment;
 import portfolio.project.hashtagqna.entity.Question;
-import portfolio.project.hashtagqna.exception.AuthorizationExeption;
+import portfolio.project.hashtagqna.exception.AuthExeption;
 import portfolio.project.hashtagqna.repository.QuCommentRepository;
 import portfolio.project.hashtagqna.repository.QuestionRepository;
 
@@ -26,7 +26,7 @@ public class QuCommentService {
     @Transactional
     public Long updateQuComment(QuComment oldQuComment, QuComment editedQuComment, Member quCommentWriter) {
         if (oldQuComment.getMember() != quCommentWriter) {
-            throw new AuthorizationExeption("댓글 작성자만이 댓글을 수정할 수 있습니다.");
+            throw new AuthExeption("댓글 작성자만이 댓글을 수정할 수 있습니다.");
         }
         return quCommentRepository.updateQuComment(oldQuComment, editedQuComment);
     }
@@ -34,7 +34,7 @@ public class QuCommentService {
     @Transactional
     public Long removeQuComment(QuComment quComment, Member quCommentWriter) {
         if (quComment.getMember() != quCommentWriter) {
-            throw new AuthorizationExeption("댓글 작성자만이 댓글을 삭제할 수 있습니다.");
+            throw new AuthExeption("댓글 작성자만이 댓글을 삭제할 수 있습니다.");
         }
         quComment.getQuestion().decreaseQuCommentCount();
         quCommentWriter.decreaseCommentCount();

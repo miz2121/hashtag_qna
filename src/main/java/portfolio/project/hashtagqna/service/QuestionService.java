@@ -9,12 +9,13 @@ import org.springframework.transaction.annotation.Transactional;
 import portfolio.project.hashtagqna.dto.QuestionDto;
 import portfolio.project.hashtagqna.dto.QuestionListDto;
 import portfolio.project.hashtagqna.entity.*;
-import portfolio.project.hashtagqna.exception.AuthorizationExeption;
+import portfolio.project.hashtagqna.exception.AuthExeption;
 import portfolio.project.hashtagqna.repository.HashtagRepository;
 import portfolio.project.hashtagqna.repository.QuestionHashtagRepository;
 import portfolio.project.hashtagqna.repository.QuestionRepository;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Transactional(readOnly = true)
@@ -97,10 +98,10 @@ public class QuestionService {
     @Transactional
     public long updateQuestion(Question oldQuestion, Question editedQuestion, Member questionWriter) {
         if (oldQuestion.getQuestionStatus() == QuestionStatus.CLOSED) {
-            throw new AuthorizationExeption("닫힌 질문은 수정이나 삭제할 수 없습니다.");
+            throw new AuthExeption("닫힌 질문은 수정이나 삭제할 수 없습니다.");
         }
         if (oldQuestion.getMember() != questionWriter) {
-            throw new AuthorizationExeption("질문 작성자만이 질문을 수정할 수 있습니다.");
+            throw new AuthExeption("질문 작성자만이 질문을 수정할 수 있습니다.");
         }
         return questionRepository.updateQuestion(oldQuestion, editedQuestion);
     }
@@ -108,10 +109,10 @@ public class QuestionService {
     @Transactional
     public long removeQuestion(Question question, Member questionWriter) {
         if (question.getQuestionStatus() == QuestionStatus.CLOSED) {
-            throw new AuthorizationExeption("닫힌 질문은 수정이나 삭제할 수 없습니다.");
+            throw new AuthExeption("닫힌 질문은 수정이나 삭제할 수 없습니다.");
         }
-        if (question.getMember() != questionWriter) {
-            throw new AuthorizationExeption("질문 작성자만이 질문을 삭제할 수 있습니다.");
+        if (!Objects.equals(question.getMember().getId(), questionWriter.getId())) {
+            throw new AuthExeption("질문 작성자만이 질문을 삭제할 수 있습니다.");
         }
 
         for (int i = 0; i < question.getQuestionHashtags().size(); i++) {

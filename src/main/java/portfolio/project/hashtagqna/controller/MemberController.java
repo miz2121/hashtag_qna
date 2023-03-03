@@ -33,6 +33,7 @@ public class MemberController {
         memberService.signIn(member);
 
         HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
         headers.add("Location", "/login");  // redirect
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
@@ -44,6 +45,7 @@ public class MemberController {
         memberService.logIn(principal.getUsername(), principal.getPassword());
 
         HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
         headers.add("Location", "/home");  // redirect
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
@@ -75,7 +77,9 @@ public class MemberController {
         memberService.editMember(id, editedMember);
 
         HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
         headers.add("Location", "/home");  // redirect
+        headers.add("Email", memberDto.getEmail());
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 

@@ -88,10 +88,10 @@ public class QuestionService {
         save.addMember(questionWriter);
 
         if (!existHashtagDtos.isEmpty()) {
-            List<HashtagDto> selectedHashtagsExist = hashtagRepository.findAllSelectedHashtags(existHashtagDtos);
-            for (HashtagDto hashtagDto : selectedHashtagsExist) {
+//            hashtagRepository.findAllSelectedHashtags(existHashtagDtos);  // 얘는 다른 api로 빼자.
+            for (HashtagDto existHashtagDto : existHashtagDtos) {
                 Hashtag ht = Hashtag.builder()
-                        .hashtagName(hashtagDto.getHashtagName())
+                        .hashtagName(existHashtagDto.getHashtagName())
                         .member(questionWriter)
                         .build();
                 ht.addMember(questionWriter);

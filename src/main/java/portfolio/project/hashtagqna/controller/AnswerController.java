@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import portfolio.project.hashtagqna.config.auth.PrincipalDetails;
 import portfolio.project.hashtagqna.dto.AnswerDto;
 import portfolio.project.hashtagqna.dto.CreateAnswerDto;
+import portfolio.project.hashtagqna.dto.ScoreStringDto;
 import portfolio.project.hashtagqna.entity.Answer;
 import portfolio.project.hashtagqna.entity.Member;
 import portfolio.project.hashtagqna.entity.Question;
@@ -75,19 +76,16 @@ public class AnswerController {
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
-    @PostMapping("questions/{qid}/answers/remove/{answerid}")
+    @PostMapping("questions/{qid}/answers/remove/{aid}")
     public ResponseEntity<Object> removeAnswer(
             Authentication authentication,
             @PathVariable Long qid,
-            @PathVariable Long answerid
+            @PathVariable Long aid
     ) {
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        Long loginUserId = principalDetails.getMember().getId();
 
-        Member loginUser = memberService.findMemberById(principalDetails.getMember().getId());
-        Question question = questionService.findQuestionById(qid);
-        Answer answer = answerService.findAnswerById(answerid);
-
-        Long aLong = answerService.removeAnswer(question.getId(), answer, loginUser);
+        Long aLong = answerService.removeAnswer(qid, aid, loginUserId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -95,17 +93,19 @@ public class AnswerController {
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
-    @PatchMapping("/questions/{qid}/answers/select/{answerid}")
+    @PatchMapping("/questions/{qid}/answers/select/{aid}")
     public ResponseEntity<Object> selectAnswerAndGiveScore(
             Authentication authentication,
             @PathVariable Long qid,
-            @PathVariable Long answerid,
-            @RequestBody String scoreString
-    ) {
+            @PathVariable Long aid,
+            @RequestBody ScoreStringDto scoreStringDto
+            ) {
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
-        Member loginUser = memberService.findMemberById(principalDetails.getMember().getId());
+        Long loginUserId = principalDetails.getMember().getId();
 
-        answerService.makeAnswerSelectedAndGiveScore(scoreString, qid, answerid, loginUser);
+        String scoreString = scoreStringDto.getScoreString();
+
+        answerService.makeAnswerSelectedAndGiveScore(scoreString, qid, aid, loginUserId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

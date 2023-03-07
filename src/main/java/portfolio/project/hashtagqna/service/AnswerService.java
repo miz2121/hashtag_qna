@@ -7,9 +7,11 @@ import portfolio.project.hashtagqna.dto.AnswerDto;
 import portfolio.project.hashtagqna.entity.*;
 import portfolio.project.hashtagqna.exception.AuthExeption;
 import portfolio.project.hashtagqna.repository.AnswerRepository;
+import portfolio.project.hashtagqna.repository.MemberRepository;
 import portfolio.project.hashtagqna.repository.QuestionRepository;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Transactional(readOnly = true)
@@ -17,6 +19,7 @@ import java.util.List;
 public class AnswerService {
     private final AnswerRepository answerRepository;
     private final QuestionRepository questionRepository;
+    private final MemberRepository memberRepository;
 
     /**
      * @param questionId
@@ -41,14 +44,14 @@ public class AnswerService {
      * @param scoreString, "1" ~ "5"
      * @param questionId
      * @param answerId
-     * @param loginUser
+     * @param loginUserId
      * @return
      */
     @Transactional
-    public Long makeAnswerSelectedAndGiveScore(String scoreString, Long questionId, Long answerId, Member loginUser) {
+    public Long makeAnswerSelectedAndGiveScore(String scoreString, Long questionId, Long answerId, Long loginUserId) {
         Question question = questionRepository.findQuestionById(questionId);
         Answer answer = answerRepository.findAnswerById(answerId);
-        if (question.getMember() != loginUser) {
+        if (!Objects.equals(question.getMember().getId(), loginUserId)) {
             throw new AuthExeption("질문 작성자가 아닌 사람은 채택할 수 없습니다.");
         }
         if (question.getQuestionStatus().equals(QuestionStatus.CLOSED)){
@@ -72,14 +75,18 @@ public class AnswerService {
     }
 
     @Transactional
-    public Long removeAnswer(Long questionId, Answer answer, Member loginUser) {
+    public Long removeAnswer(Long questionId, Long answerId, Long loginUserId) {
         Question question = questionRepository.findQuestionById(questionId);
-        if (answer.getMember() != loginUser) {
+        Answer answer = answerRepository.findAnswerById(answerId);
+        Member loginUser = memberRepository.findMemberById(loginUserId);
+
+        if (!Objects.equals(answer.getMember().getId(), loginUserId)) {
             throw new AuthExeption("답변 작성자만이 답변을 삭제할 수 있습니다.");
         }
         if (question.getQuestionStatus().equals(QuestionStatus.CLOSED)){
-            throw new AuthExeption("닫힌 질문 글은 더 이상 수정할 수 없습니다.");
+            throw new AuthExeption("닫힌 질문 글은 더 이상 수정 및 삭제할 수 없습니다.");
         }
+
         question.decreaseAnswerCount();
         loginUser.decreaseAnswerCount();
         return answerRepository.removeAnswer(answer);

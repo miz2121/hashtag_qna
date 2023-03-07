@@ -30,9 +30,7 @@ public class HashtagRepositoryImpl implements HashtagRepositoryCustom {
     @Override
     public List<HashtagDto> viewAllHashtags() {
         return queryFactory
-                .select(new QHashtagDto(
-                        hashtag.hashtagName,
-                        hashtag.member.nickname))
+                .select(new QHashtagDto(hashtag.hashtagName)).distinct()
                 .from(hashtag)
                 .fetch();
     }
@@ -40,9 +38,7 @@ public class HashtagRepositoryImpl implements HashtagRepositoryCustom {
     @Override
     public List<HashtagDto> findAllSelectedHashtags(List<HashtagDto> hashtags) {
         JPAQuery<HashtagDto> query = queryFactory
-                .select(new QHashtagDto(
-                        hashtag.hashtagName,
-                        hashtag.member.nickname))
+                .select(new QHashtagDto(hashtag.hashtagName)).distinct()
                 .from(hashtag);
 
         BooleanBuilder builder = new BooleanBuilder();
@@ -57,21 +53,17 @@ public class HashtagRepositoryImpl implements HashtagRepositoryCustom {
     @Override
     public List<HashtagDto> viewMyAllHashtags(Member member) {
         return queryFactory
-                .select(new QHashtagDto(
-                        hashtag.hashtagName,
-                        hashtag.member.nickname))
+                .select(new QHashtagDto(hashtag.hashtagName)).distinct()
                 .from(hashtag)
                 .where(hashtag.member.eq(member))
                 .fetch();
     }
 
     @Override
-    public List<HashtagDto> viewHashtagsAtQuestion(Long questionId){
+    public List<HashtagDto> viewHashtagsAtQuestion(Long questionId) {
         return queryFactory.select(
-                new QHashtagDto(
-                        hashtag.hashtagName,
-                        hashtag.member.nickname)
-                )
+                        new QHashtagDto(hashtag.hashtagName)
+                ).distinct()
                 .from(hashtag)
                 .join(hashtag.questionHashtags, questionHashtag)
                 .on(hashtag.id.eq(questionHashtag.hashtag.id))

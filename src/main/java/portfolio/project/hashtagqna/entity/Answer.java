@@ -7,6 +7,7 @@ import org.hibernate.annotations.ColumnDefault;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -76,13 +77,18 @@ public class Answer extends BaseEntity {
     }
 
     public Long giveScore(String scoreString) {
-        int rat = getRating();
-        switch (scoreString) {
-            case "1" -> setRating(1);
-            case "2" -> setRating(2);
-            case "3" -> setRating(3);
-            case "4" -> setRating(4);
-            case "5" -> setRating(5);
+        if (Objects.equals(scoreString, "0")) {
+            setRating(0);
+        } else if (Objects.equals(scoreString, "1")) {
+            setRating(1);
+        } else if (Objects.equals(scoreString, "2")) {
+            setRating(2);
+        } else if (Objects.equals(scoreString, "3")) {
+            setRating(3);
+        } else if (Objects.equals(scoreString, "4")) {
+            setRating(4);
+        } else if (Objects.equals(scoreString, "5")) {
+            setRating(5);
         }
         return getId();
     }

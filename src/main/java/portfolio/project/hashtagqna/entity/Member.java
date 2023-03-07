@@ -87,11 +87,7 @@ public class Member extends BaseEntity {
     }
 
     public Long decreaseQuestionCount() {
-        if (getQuestionCount() - 1 < 0) {
-            setQuestionCount(0);
-        } else {
-            setQuestionCount(getQuestionCount() - 1);
-        }
+        setQuestionCount(Math.max(getQuestionCount() - 1, 0));
         return getId();
     }
 
@@ -101,10 +97,10 @@ public class Member extends BaseEntity {
     }
 
     public Long decreaseAnswerCount() {
-        if (getQuestionCount() - 1 < 0) {
-            setQuestionCount(0);
+        if (getAnswerCount() - 1 < 0) {
+            setAnswerCount(0);
         } else {
-            setQuestionCount(getQuestionCount() - 1);
+            setAnswerCount(getAnswerCount() - 1);
         }
         return getId();
     }
@@ -129,9 +125,9 @@ public class Member extends BaseEntity {
     }
 
     public Long decreaseCommentCount() {
-        if (getCommentCount() - 1 < 0 ){
+        if (getCommentCount() - 1 < 0) {
             setCommentCount(0);
-        }else{
+        } else {
             setCommentCount(getCommentCount() - 1);
         }
         return getId();

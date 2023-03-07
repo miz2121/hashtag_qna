@@ -7,14 +7,12 @@ import portfolio.project.hashtagqna.entity.Member;
 @Data
 public class HashtagDto {
     private String hashtagName;
-    private String writer;
 
     public HashtagDto() {
     }
 
     @QueryProjection
-    public HashtagDto(String hashtagName, String writer) {
+    public HashtagDto(String hashtagName) {
         this.hashtagName = hashtagName;
-        this.writer = writer;
     }
 }

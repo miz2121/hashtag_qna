@@ -3,10 +3,15 @@ package portfolio.project.hashtagqna.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import portfolio.project.hashtagqna.dto.AnswerDto;
 import portfolio.project.hashtagqna.entity.*;
-import portfolio.project.hashtagqna.exception.AuthorizationExeption;
+import portfolio.project.hashtagqna.exception.AuthExeption;
 import portfolio.project.hashtagqna.repository.AnswerRepository;
+import portfolio.project.hashtagqna.repository.MemberRepository;
 import portfolio.project.hashtagqna.repository.QuestionRepository;
+
+import java.util.List;
+import java.util.Objects;
 
 @Service
 @Transactional(readOnly = true)
@@ -14,75 +19,84 @@ import portfolio.project.hashtagqna.repository.QuestionRepository;
 public class AnswerService {
     private final AnswerRepository answerRepository;
     private final QuestionRepository questionRepository;
+    private final MemberRepository memberRepository;
 
     /**
      * @param questionId
      * @param answer
-     * @param answerWriter
+     * @param loginUser
      * @return answer.getId();
      */
     @Transactional
-    public Long addAnswer(Long questionId, Answer answer, Member answerWriter) {
+    public Long addAnswer(Long questionId, Answer answer, Member loginUser) {
         Question question = questionRepository.findQuestionById(questionId);
         if (question.getQuestionStatus() == QuestionStatus.CLOSED) {
-            throw new AuthorizationExeption("채택된 글에는 답변을 더 이상 달 수 없습니다.");
-        } else if (question.getMember() == answerWriter) {
-            throw new AuthorizationExeption("작성자가 아닌 사람이 답변을 달 수 있습니다.");
+            throw new AuthExeption("채택된 글에는 답변을 더 이상 달 수 없습니다.");
+        } else if (question.getMember() == loginUser) {
+            throw new AuthExeption("작성자가 아닌 사람이 답변을 달 수 있습니다.");
         }
         answerRepository.save(answer);
-        answer.addQuestionAndMember(question, answerWriter);
+        answer.addQuestionAndMember(question, loginUser);
         return answer.getId();
     }
 
     /**
+     * @param scoreString, "1" ~ "5"
      * @param questionId
-     * @param answer
-     * @param questionWriter
-     * @return answerId
+     * @param answerId
+     * @param loginUserId
+     * @return
      */
     @Transactional
-    public Long makeAnswerSelected(Long questionId, Answer answer, Member questionWriter) {
+    public Long makeAnswerSelectedAndGiveScore(String scoreString, Long questionId, Long answerId, Long loginUserId) {
         Question question = questionRepository.findQuestionById(questionId);
-        if (question.getMember() != questionWriter) {
-            throw new AuthorizationExeption("질문 작성자가 아닌 사람은 채택할 수 없습니다.");
+        Answer answer = answerRepository.findAnswerById(answerId);
+        if (!Objects.equals(question.getMember().getId(), loginUserId)) {
+            throw new AuthExeption("질문 작성자가 아닌 사람은 채택할 수 없습니다.");
         }
-        Long answerId = answerRepository.makeAnswerSelected(answer);
+        if (question.getQuestionStatus().equals(QuestionStatus.CLOSED)){
+            throw new AuthExeption("닫힌 질문 글은 더 이상 수정할 수 없습니다.");
+        }
+        answer.selectAnswer();
+        answer.giveScore(scoreString);
         question.closeQuestion();
         return answerId;
     }
 
-    /**
-     * @param scoreStatus
-     * @param questionId
-     * @param answer
-     * @param questionWriter
-     * @return answerId
-     */
     @Transactional
-    public Long giveAnswerScore(ScoreStatus scoreStatus, Long questionId, Answer answer, Member questionWriter) {
-        Question question = questionRepository.findQuestionById(questionId);
-        if (question.getMember() != questionWriter) {
-            throw new AuthorizationExeption("질문 작성자가 아닌 사람은 채택할 수 없습니다.");
+    public Long updateAnswer(Answer oldAnswer, Answer editedAnswer, Member loginUser, Question question) {
+        if (oldAnswer.getMember() != loginUser) {
+            throw new AuthExeption("답변 작성자만이 답변을 수정할 수 있습니다.");
         }
-        return answerRepository.giveAnswerScore(answer, scoreStatus);
-    }
-
-    @Transactional
-    public Long updateAnswer(Answer oldAnswer, Answer editedAnswer, Member answerWriter) {
-        if (oldAnswer.getMember() != answerWriter) {
-            throw new AuthorizationExeption("답변 작성자만이 답변을 수정할 수 있습니다.");
+        if (question.getQuestionStatus().equals(QuestionStatus.CLOSED)){
+            throw new AuthExeption("닫힌 질문 글은 더 이상 수정할 수 없습니다.");
         }
         return answerRepository.updateAnswer(oldAnswer, editedAnswer);
     }
 
     @Transactional
-    public Long removeAnswer(Long questionId, Answer answer, Member answerWriter) {
-        if (answer.getMember() != answerWriter) {
-            throw new AuthorizationExeption("답변 작성자만이 답변을 삭제할 수 있습니다.");
-        }
+    public Long removeAnswer(Long questionId, Long answerId, Long loginUserId) {
         Question question = questionRepository.findQuestionById(questionId);
+        Answer answer = answerRepository.findAnswerById(answerId);
+        Member loginUser = memberRepository.findMemberById(loginUserId);
+
+        if (!Objects.equals(answer.getMember().getId(), loginUserId)) {
+            throw new AuthExeption("답변 작성자만이 답변을 삭제할 수 있습니다.");
+        }
+        if (question.getQuestionStatus().equals(QuestionStatus.CLOSED)){
+            throw new AuthExeption("닫힌 질문 글은 더 이상 수정 및 삭제할 수 없습니다.");
+        }
+
         question.decreaseAnswerCount();
-        answerWriter.decreaseAnswerCount();
+        loginUser.decreaseAnswerCount();
         return answerRepository.removeAnswer(answer);
+    }
+
+    public List<AnswerDto> viewAnswers(Long questionId){
+        return answerRepository.viewAnswers(questionId);
+    }
+
+    public Answer findAnswerById(Long answerId) {
+        return answerRepository.findAnswerById(answerId);
     }
 }

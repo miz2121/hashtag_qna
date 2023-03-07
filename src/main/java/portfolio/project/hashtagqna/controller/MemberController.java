@@ -2,64 +2,98 @@ package portfolio.project.hashtagqna.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import portfolio.project.hashtagqna.dto.HomeDto;
+import portfolio.project.hashtagqna.config.auth.PrincipalDetails;
 import portfolio.project.hashtagqna.dto.MemberDto;
 import portfolio.project.hashtagqna.dto.MemberInfoDto;
-import portfolio.project.hashtagqna.dto.MemberStatusDto;
 import portfolio.project.hashtagqna.entity.Member;
 import portfolio.project.hashtagqna.service.MemberService;
-
-import java.nio.charset.StandardCharsets;
 
 @Controller
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @PostMapping("/join")
     public ResponseEntity<Object> join(@RequestBody MemberDto memberDto) {
+
         Member member = Member.builder()
                 .email(memberDto.getEmail())
-                .pwd(memberDto.getPwd())
+                .pwd(bCryptPasswordEncoder.encode(memberDto.getPwd()))
                 .nickname(memberDto.getNickname())
                 .build();
         memberService.signIn(member);
-        return new ResponseEntity<>(HttpStatus.OK);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("Location", "/login");  // redirect
+        return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Object> login(@RequestBody String email, @RequestBody String pwd) {
-        memberService.logIn(email, pwd);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<Object> login(
+            Authentication authentication) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+
+        memberService.logIn(principal.getUsername(), principal.getPassword());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("Location", "/home");  // redirect
+        return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
-    @GetMapping("/members/{id}")
+    @GetMapping("/members")
     @ResponseBody
-    public ResponseEntity<MemberInfoDto> viewInfo(@PathVariable Long id) {
-        MemberInfoDto memberInfoDto = memberService.viewInfo(id);
+    public ResponseEntity<MemberInfoDto> viewInfo(
+            Authentication authentication) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        MemberInfoDto memberInfoDto = new MemberInfoDto();
 
-//        HttpHeaders header = new HttpHeaders();
-//        header.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
-//        return new ResponseEntity<>(memberInfoDto, header, HttpStatus.OK);
+        memberInfoDto.setNickname(principal.getMember().getNickname());
+        memberInfoDto.setEmail(principal.getMember().getEmail());
+        memberInfoDto.setQuestionCount(principal.getMember().getQuestionCount());
+        memberInfoDto.setAnswerCount(principal.getMember().getAnswerCount());
+        memberInfoDto.setCommentCount(principal.getMember().getCommentCount());
+        memberInfoDto.setHashtagCount(principal.getMember().getHashtagCount());
+
         return new ResponseEntity<>(memberInfoDto, HttpStatus.OK);
     }
 
-    @PatchMapping("/members/{id}")
-    public ResponseEntity<Object> update(@PathVariable("id") Long id, @RequestBody MemberDto memberDto) {
+    @PatchMapping("/members")
+    public ResponseEntity<Object> edit(
+            Authentication authentication,
+            @RequestBody MemberDto memberDto) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        Member member = memberService.findMemberById(principal.getMember().getId());
+
         Member editedMember = Member.builder()
-                .email(memberDto.getEmail())
-                .pwd(memberDto.getPwd())
+                .email(member.getEmail())
+                .pwd(bCryptPasswordEncoder.encode(memberDto.getPwd()))
                 .nickname(memberDto.getNickname())
                 .build();
-        memberService.editMember(id, editedMember);
-        return new ResponseEntity<>(HttpStatus.OK);
+
+        memberService.editMember(member.getId(), editedMember);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("Location", "/home");  // redirect
+        headers.add("Email", memberDto.getEmail());
+        return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
-    @PutMapping("/members/inactive/{id}")
-    public ResponseEntity<Object> signOut(@PathVariable Long id) {
-        memberService.signOut(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+    @PutMapping("/members/inactive")
+    public ResponseEntity<Object> signOut(Authentication authentication) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+
+        Member loginMember = memberService.findMemberById(principal.getMember().getId());
+        memberService.signOut(loginMember.getId());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Location", "/home");  // redirect
+        return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 }

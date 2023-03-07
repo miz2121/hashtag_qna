@@ -112,6 +112,15 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
     }
 
     @Override
+    public Long findByNickname(String nickname) {
+        return queryFactory
+                .select(member.id)
+                .from(member)
+                .where(memberNicknameEq(nickname))
+                .fetchFirst();
+    }
+
+    @Override
     public Long findByEmailNickname(String email, String nickname) {
         return queryFactory
                 .select(member.id)
@@ -127,6 +136,18 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                 .from(member)
                 .where(memberEmailEq(email), memberPwdEq(pwd))
                 .fetchFirst();
+    }
+
+    @Override
+    public Member findMemberByEmail(String email) {
+        return queryFactory
+                .selectFrom(member)
+                .where(memberEmailEq(email))
+                .fetchFirst();
+    }
+
+    private BooleanExpression memberNicknameEq(String nicknameCond) {
+        return nicknameCond != null ? member.nickname.eq(nicknameCond) : null;
     }
 
     private BooleanExpression memberEmailEq(String emailCond) {

@@ -21,11 +21,15 @@ public class HashtagService {
         return hashtagRepository.viewAllHashtags();
     }
 
-    public List<HashtagDto> choiceHashtags(List<Hashtag> hashtags) {
+    public List<HashtagDto> choiceHashtags(List<HashtagDto> hashtags) {
         return hashtagRepository.findAllSelectedHashtags(hashtags);
     }
 
     public List<HashtagDto> viewAllMyHashtags(Member member) {
         return hashtagRepository.viewMyAllHashtags(member);
+    }
+
+    public List<HashtagDto> viewHashtagsAtQuestion(Long questionId){
+        return hashtagRepository.viewHashtagsAtQuestion(questionId);
     }
 }

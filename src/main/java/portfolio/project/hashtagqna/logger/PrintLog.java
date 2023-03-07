@@ -9,6 +9,6 @@ public class PrintLog extends Log {
 
     @Override
     public void printInfoLog(String text) {
-        log.info(text);
+        log.info("log.info: " + text);
     }
 }

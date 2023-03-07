@@ -48,7 +48,6 @@ public class Hashtag extends BaseEntity{
         }
         this.member = member;
         member.getHashtags().add(this);
-        member.increaseHashTagCount();
         return getId();
     }
 }

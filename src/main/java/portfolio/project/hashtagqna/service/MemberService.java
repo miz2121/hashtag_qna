@@ -69,7 +69,8 @@ public class MemberService {
      */
     @Transactional
     public long signOut(Long id) {
-        return memberRepository.makeInactiveMember(id);
+        Member loginMember = memberRepository.findMemberById(id);
+        return memberRepository.makeInactiveMember(loginMember.getId());
     }
 
     public MemberInfoDto viewInfo(Long id) {

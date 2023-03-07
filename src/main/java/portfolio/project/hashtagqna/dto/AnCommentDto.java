@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class AnCommentDto {
+    private Long answerId;
     private String writer;
     private LocalDateTime date;
     private String content;
@@ -15,7 +16,8 @@ public class AnCommentDto {
     }
 
     @QueryProjection
-    public AnCommentDto(String writer, LocalDateTime date, String content) {
+    public AnCommentDto(Long answerId, String writer, LocalDateTime date, String content) {
+        this.answerId = answerId;
         this.writer = writer;
         this.date = date;
         this.content = content;

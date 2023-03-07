@@ -30,9 +30,6 @@ public class HomeController {
         List<QuestionListDto> questionListDtos = questionService.viewFiveQuestions();
         List<HashtagDto> hashtagDtos = hashtagService.viewAllHashtags();
 
-//        HttpHeaders header = new HttpHeaders();
-//        header.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
-//        return new ResponseEntity<>(new HomeDto(questionListDtos, hashtagDtos), header, HttpStatus.OK);
         return new ResponseEntity<>(new HomeDto(questionListDtos, hashtagDtos), HttpStatus.OK);
     }
 }

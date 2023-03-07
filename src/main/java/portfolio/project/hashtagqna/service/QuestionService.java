@@ -111,6 +111,7 @@ public class QuestionService {
                         .build();
                 hashtagRepository.save(ht);
                 ht.addMember(questionWriter);
+                questionWriter.increaseHashTagCount();
                 QuestionHashtag createdQuestionHashtag = QuestionHashtag.builder()
                         .question(question)
                         .hashtag(ht)
@@ -183,10 +184,10 @@ public class QuestionService {
         return questionRepository.viewQuestion(id);
     }
 
-    public Page<QuestionListDto> viewQuestionsByOneHashtag(Pageable pageable, Hashtag ht) {
+    public Page<QuestionListDto> viewQuestionsByOneHashtag(Pageable pageable, String hashtagName) {
         int page = (pageable.getPageNumber() == 0) ? 0 : (pageable.getPageNumber() - 1);  // page는 index처럼 0부터 시작
         pageable = PageRequest.of(page, pageable.getPageSize());
-        return questionRepository.viewQuestionsByOneHashtag(pageable, ht);
+        return questionRepository.viewQuestionsByOneHashtag(pageable, hashtagName);
     }
 
     public QuestionDto showQuestionById(Long id) {

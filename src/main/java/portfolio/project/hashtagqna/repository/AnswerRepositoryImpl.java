@@ -33,6 +33,7 @@ public class AnswerRepositoryImpl implements AnswerRepositoryCustom {
     public List<AnswerDto> viewAnswers(Long questionId) {
         return queryFactory
                 .select(new QAnswerDto(
+                        answer.id,
                         answer.writer,
                         answer.date,
                         answer.content,

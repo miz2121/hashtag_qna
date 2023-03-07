@@ -30,16 +30,23 @@ public class HashtagRepositoryImpl implements HashtagRepositoryCustom {
     @Override
     public List<HashtagDto> viewAllHashtags() {
         return queryFactory
-                .select(new QHashtagDto(hashtag.hashtagName)).distinct()
+                .select(new QHashtagDto(
+                        hashtag.hashtagName)).distinct()
                 .from(hashtag)
+                .join(hashtag.questionHashtags, questionHashtag)
+                .on(hashtag.id.eq(questionHashtag.id))
                 .fetch();
     }
 
     @Override
     public List<HashtagDto> findAllSelectedHashtags(List<HashtagDto> hashtags) {
         JPAQuery<HashtagDto> query = queryFactory
-                .select(new QHashtagDto(hashtag.hashtagName)).distinct()
-                .from(hashtag);
+                .select(new QHashtagDto(
+                        hashtag.hashtagName)).distinct()
+                .from(hashtag)
+                .join(hashtag.questionHashtags, questionHashtag)
+                .on(hashtag.id.eq(questionHashtag.id))
+                ;
 
         BooleanBuilder builder = new BooleanBuilder();
         for (HashtagDto ht : hashtags) {
@@ -53,8 +60,11 @@ public class HashtagRepositoryImpl implements HashtagRepositoryCustom {
     @Override
     public List<HashtagDto> viewMyAllHashtags(Member member) {
         return queryFactory
-                .select(new QHashtagDto(hashtag.hashtagName)).distinct()
+                .select(new QHashtagDto(
+                        hashtag.hashtagName)).distinct()
                 .from(hashtag)
+                .join(hashtag.questionHashtags, questionHashtag)
+                .on(hashtag.id.eq(questionHashtag.id))
                 .where(hashtag.member.eq(member))
                 .fetch();
     }
@@ -62,7 +72,8 @@ public class HashtagRepositoryImpl implements HashtagRepositoryCustom {
     @Override
     public List<HashtagDto> viewHashtagsAtQuestion(Long questionId) {
         return queryFactory.select(
-                        new QHashtagDto(hashtag.hashtagName)
+                        new QHashtagDto(
+                                hashtag.hashtagName)
                 ).distinct()
                 .from(hashtag)
                 .join(hashtag.questionHashtags, questionHashtag)

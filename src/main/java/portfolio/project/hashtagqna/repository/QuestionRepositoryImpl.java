@@ -335,6 +335,8 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                 .from(question)
                 .join(question.quComments, quComment)
                 .on(question.id.eq(quComment.question.id))
+                .join(question.answers, answer)
+                .on(question.id.eq(answer.question.id))
                 .join(answer.anComments, anComment)
                 .on(answer.id.eq(anComment.answer.id))
                 .where(quComment.member.eq(member)
@@ -383,8 +385,8 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                         question.date))
                 .from(question)
                 .join(question.questionHashtags, questionHashtag)
-                .on(question.id.eq(questionHashtag.question.id))
-                .join(hashtag, questionHashtag.hashtag)
+                .on(question.id.eq(questionHashtag.id))
+                .join(questionHashtag.hashtag, hashtag)
                 .on(hashtag.id.eq(questionHashtag.hashtag.id))
                 .where(hashtag.member.eq(member))
                 .offset(pageable.getOffset())
@@ -411,7 +413,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     }
 
     @Override
-    public Page<QuestionListDto> viewQuestionsByOneHashtag(Pageable pageable, Hashtag ht) {
+    public Page<QuestionListDto> viewQuestionsByOneHashtag(Pageable pageable, String hashtagName) {
         List<QuestionListDto> content = queryFactory
                 .select(new QQuestionListDto(
                         question.writer,
@@ -424,7 +426,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                 .on(question.id.eq(questionHashtag.question.id))
                 .join(questionHashtag.hashtag)
                 .on(hashtag.id.eq(questionHashtag.hashtag.id))
-                .where(hashtag.eq(ht))
+                .where(hashtag.hashtagName.eq(hashtagName))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();

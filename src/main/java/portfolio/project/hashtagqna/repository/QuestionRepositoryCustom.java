@@ -43,5 +43,5 @@ public interface QuestionRepositoryCustom {
 
     public long updateNickname(Long oldMemberId, Member editedMember);
 
-    public Page<QuestionListDto> viewQuestionsByOneHashtag(Pageable pageable, Hashtag ht);
+    public Page<QuestionListDto> viewQuestionsByOneHashtag(Pageable pageable, String hashtagName);
 }

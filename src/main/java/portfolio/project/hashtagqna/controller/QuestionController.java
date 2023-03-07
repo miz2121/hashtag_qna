@@ -16,10 +16,8 @@ import portfolio.project.hashtagqna.dto.*;
 import portfolio.project.hashtagqna.entity.Hashtag;
 import portfolio.project.hashtagqna.entity.Member;
 import portfolio.project.hashtagqna.entity.Question;
-import portfolio.project.hashtagqna.service.AnswerService;
-import portfolio.project.hashtagqna.service.HashtagService;
-import portfolio.project.hashtagqna.service.MemberService;
-import portfolio.project.hashtagqna.service.QuestionService;
+import portfolio.project.hashtagqna.repository.QuestionRepository;
+import portfolio.project.hashtagqna.service.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +29,9 @@ public class QuestionController {
     private final MemberService memberService;
     private final HashtagService hashtagService;
     private final AnswerService answerService;
+    private final QuCommentService quCommentService;
+    private final AnCommentService anCommentService;
+    private final QuestionRepository questionRepository;
 
     @PostMapping("/questions")
     public ResponseEntity<Object> createQuestion(
@@ -48,21 +49,30 @@ public class QuestionController {
         List<HashtagDto> existHashtagDtos = createQuestionDto.getExistHashtagDtos();
         List<HashtagDto> newHashtagDtos = createQuestionDto.getNewHashtagDtos();
 
-        questionService.writeQuestion(question, questionWriter, existHashtagDtos, newHashtagDtos);
+        Long qid = questionService.writeQuestion(question, questionWriter, existHashtagDtos, newHashtagDtos);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.add("Location", "/questions/{questionid}");  // redirect
+        headers.add("Location", "/questions/" + qid);  // redirect
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
-    @GetMapping("/questions/{questionid}")
+    @GetMapping("/questions/{qid}")
     @ResponseBody
-    public ResponseEntity<QuestionWithHashtagsDto> viewQuestion(@PathVariable Long questionid) {
-        QuestionDto questionDto = questionService.viewQuestion(questionid);
-        List<HashtagDto> hashtagDtos = hashtagService.viewHashtagsAtQuestion(questionid);
-        List<AnswerDto> answerDtos = answerService.viewAnswers(questionid);
-        QuestionWithHashtagsDto questionWithHashtagsDto = new QuestionWithHashtagsDto(questionDto, hashtagDtos, answerDtos);
+    public ResponseEntity<QuestionWithHashtagsDto> viewQuestion(@PathVariable Long qid) {
+        QuestionDto questionDto = questionService.viewQuestion(qid);
+        List<HashtagDto> hashtagDtos = hashtagService.viewHashtagsAtQuestion(qid);
+        List<AnswerDto> answerDtos = answerService.viewAnswers(qid);
+        List<QuCommentDto> quCommentDtos = quCommentService.viewQuComments(qid);
+        List<AnCommentDto> anCommentDtos = anCommentService.viewAnComments(qid);
+
+        QuestionWithHashtagsDto questionWithHashtagsDto = QuestionWithHashtagsDto.builder()
+                .questionDto(questionDto)
+                .hashtagDtos(hashtagDtos)
+                .answerDtos(answerDtos)
+                .quCommentDtos(quCommentDtos)
+                .anCommentDtos(anCommentDtos)
+                .build();
         return new ResponseEntity<>(questionWithHashtagsDto, HttpStatus.OK);
     }
 
@@ -154,6 +164,7 @@ public class QuestionController {
             @PageableDefault(size = 10) Pageable pageable) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         Member member = memberService.findMemberById(principal.getMember().getId());
+
         Page<QuestionListDto> questionListDtos = questionService.viewMyQuestions(pageable, member);
         return new ResponseEntity<>(questionListDtos, HttpStatus.OK);
     }
@@ -165,6 +176,7 @@ public class QuestionController {
             @PageableDefault(size = 10) Pageable pageable) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         Member member = memberService.findMemberById(principal.getMember().getId());
+
         Page<QuestionListDto> questionListDtos = questionService.viewMyComments(pageable, member);
         return new ResponseEntity<>(questionListDtos, HttpStatus.OK);
     }
@@ -176,6 +188,7 @@ public class QuestionController {
             @PageableDefault(size = 10) Pageable pageable) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         Member member = memberService.findMemberById(principal.getMember().getId());
+
         Page<QuestionListDto> questionListDtos = questionService.viewMyAnswers(pageable, member);
         return new ResponseEntity<>(questionListDtos, HttpStatus.OK);
     }
@@ -187,6 +200,7 @@ public class QuestionController {
             @PageableDefault(size = 10) Pageable pageable) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         Member member = memberService.findMemberById(principal.getMember().getId());
+
         Page<QuestionListDto> questionListDtos = questionService.viewMyHashtags(pageable, member);
         return new ResponseEntity<>(questionListDtos, HttpStatus.OK);
     }
@@ -207,25 +221,38 @@ public class QuestionController {
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
-    @PatchMapping("/questions/{questionid}")
+    @PatchMapping("/questions/{qid}")
     public ResponseEntity<Object> updateQuestion(
             Authentication authentication,
             @RequestBody QuestionDto questionDto,
-            @PathVariable Long questionid
+            @PathVariable Long qid
     ) {
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
         Member loginMember = memberService.findMemberById(principalDetails.getMember().getId());
-        Question oldQuestion = questionService.findQuestionById(questionid);
+        Question oldQuestion = questionService.findQuestionById(qid);
         Question editedQuestion = Question.builder()
                 .title(questionDto.getTitle())
                 .content(questionDto.getContent())
                 .member(loginMember)
                 .build();
+
         long l = questionService.updateQuestion(oldQuestion, editedQuestion, loginMember);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.add("Location", "/questions/{questionid}");  // redirect
+        headers.add("Location", "/questions/" + qid);  // redirect
         return new ResponseEntity<>(headers, HttpStatus.OK);
+    }
+
+    /**
+     *
+     */
+    @GetMapping("/questions/hashtag")
+    @ResponseBody
+    public ResponseEntity<Page<QuestionListDto>> viewQuestionsByOneHashtag(
+            @PageableDefault(size = 10) Pageable pageable,
+            @RequestParam(value = "text", required = false, defaultValue = "") String text) {
+        Page<QuestionListDto> questionListDtos = questionService.viewQuestionsByOneHashtag(pageable, text);
+        return new ResponseEntity<>(questionListDtos, HttpStatus.OK);
     }
 }

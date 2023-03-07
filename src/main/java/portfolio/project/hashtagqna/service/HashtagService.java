@@ -7,6 +7,7 @@ import portfolio.project.hashtagqna.dto.HashtagDto;
 import portfolio.project.hashtagqna.entity.Hashtag;
 import portfolio.project.hashtagqna.entity.Member;
 import portfolio.project.hashtagqna.repository.HashtagRepository;
+import portfolio.project.hashtagqna.repository.MemberRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HashtagService {
     private final HashtagRepository hashtagRepository;
+    private final MemberRepository memberRepository;
 
     public List<HashtagDto> viewAllHashtags() {
         return hashtagRepository.viewAllHashtags();
@@ -25,8 +27,9 @@ public class HashtagService {
         return hashtagRepository.findAllSelectedHashtags(hashtags);
     }
 
-    public List<HashtagDto> viewAllMyHashtags(Member member) {
-        return hashtagRepository.viewMyAllHashtags(member);
+    public List<HashtagDto> viewAllMyHashtags(Long loginMemberId) {
+        Member loginMember = memberRepository.findMemberById(loginMemberId);
+        return hashtagRepository.viewMyAllHashtags(loginMember);
     }
 
     public List<HashtagDto> viewHashtagsAtQuestion(Long questionId){

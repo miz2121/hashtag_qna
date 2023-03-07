@@ -28,6 +28,7 @@ public class AnCommentRepositoryImpl implements AnCommentRepositoryCustom {
     public List<AnCommentDto> viewAnComments(Long questionId) {
         return queryFactory
                 .select(new QAnCommentDto(
+                        anComment.answer.id,
                         anComment.writer,
                         anComment.date,
                         anComment.content))

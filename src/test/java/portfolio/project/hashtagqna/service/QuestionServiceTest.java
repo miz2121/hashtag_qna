@@ -240,7 +240,7 @@ class QuestionServiceTest {
         answerService.addAnswer(question.getId(), answer, answerWriter);
         PageRequest pageable = PageRequest.of(0, 10);
         //when
-        Page<QuestionListDto> questionListDtosbyHashtag = questionService.viewQuestionsByOneHashtag(pageable, hashtag);
+        Page<QuestionListDto> questionListDtosbyHashtag = questionService.viewQuestionsByOneHashtag(pageable, hashtag.getHashtagName());
         //then
         for (QuestionListDto questionListDtobyHashtag : questionListDtosbyHashtag) {
             System.out.println("questionListDtobyHashtag = " + questionListDtobyHashtag);

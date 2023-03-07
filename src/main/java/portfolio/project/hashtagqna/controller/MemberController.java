@@ -7,15 +7,20 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import portfolio.project.hashtagqna.config.auth.PrincipalDetails;
+import portfolio.project.hashtagqna.dto.HashtagDto;
 import portfolio.project.hashtagqna.dto.MemberDto;
 import portfolio.project.hashtagqna.dto.MemberInfoDto;
 import portfolio.project.hashtagqna.entity.Member;
+import portfolio.project.hashtagqna.service.HashtagService;
 import portfolio.project.hashtagqna.service.MemberService;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
+    private final HashtagService hashtagService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @PostMapping("/join")
@@ -76,8 +81,8 @@ public class MemberController {
                 .pwd(bCryptPasswordEncoder.encode(memberDto.getPwd()))
                 .nickname(memberDto.getNickname())
                 .build();
-
         memberService.editMember(member.getId(), editedMember);
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.add("Location", "/home");  // redirect
@@ -89,11 +94,23 @@ public class MemberController {
     public ResponseEntity<Object> signOut(Authentication authentication) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
 
-        Member loginMember = memberService.findMemberById(principal.getMember().getId());
-        memberService.signOut(loginMember.getId());
+        memberService.signOut(principal.getMember().getId());
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Location", "/home");  // redirect
         return new ResponseEntity<>(headers, HttpStatus.OK);
+    }
+
+    /**
+     * 사용자가 작성한 해시태그들의 hashtagName들을 조회할 수 있음.
+     * @param authentication
+     */
+    @GetMapping("/members/hashtags")
+    @ResponseBody
+    public ResponseEntity<List<HashtagDto>> myAllHashtags(Authentication authentication) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        Long loginMemberId = principal.getMember().getId();
+        List<HashtagDto> hashtagDtos = hashtagService.viewAllMyHashtags(loginMemberId);
+        return new ResponseEntity<>(hashtagDtos, HttpStatus.OK);
     }
 }

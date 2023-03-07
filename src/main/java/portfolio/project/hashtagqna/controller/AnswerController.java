@@ -30,6 +30,13 @@ public class AnswerController {
     private final MemberService memberService;
     private final QuestionService questionService;
 
+    private static HttpHeaders getHttpHeaderWithRedirectAndApplicationJson(Long qid) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("Location", "/questions/" + qid);  // redirect
+        return headers;
+    }
+
     @PostMapping("/questions/{qid}/answers")
     public ResponseEntity<Object> createAnswer(
             Authentication authentication,
@@ -46,23 +53,22 @@ public class AnswerController {
                 .build();
         answerService.addAnswer(qid, answer, answerWriter);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.add("Location", "/questions/{questionid}");  // redirect
+        HttpHeaders headers = getHttpHeaderWithRedirectAndApplicationJson(qid);
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
-    @PatchMapping("/questions/{qid}/answers/{answerid}")
+    @PatchMapping("/questions/{qid}/answers/{aid}")
     public ResponseEntity<Object> updateAnswer(
             Authentication authentication,
             @RequestBody AnswerDto answerDto,
             @PathVariable Long qid,
-            @PathVariable Long answerid
+            @PathVariable Long aid
     ) {
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
         Member loginMember = memberService.findMemberById(principalDetails.getMember().getId());
         Question question = questionService.findQuestionById(qid);
-        Answer oldAnswer = answerService.findAnswerById(answerid);
+        Answer oldAnswer = answerService.findAnswerById(aid);
+
         Answer editedAnswer = Answer.builder()
                 .content(answerDto.getContent())
                 .question(question)
@@ -70,9 +76,7 @@ public class AnswerController {
                 .build();
         answerService.updateAnswer(oldAnswer, editedAnswer, loginMember, question);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.add("Location", "/questions/{qid}");  // redirect
+        HttpHeaders headers = getHttpHeaderWithRedirectAndApplicationJson(qid);
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
@@ -87,9 +91,7 @@ public class AnswerController {
 
         Long aLong = answerService.removeAnswer(qid, aid, loginUserId);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.add("Location", "/questions/{qid}");  // redirect
+        HttpHeaders headers = getHttpHeaderWithRedirectAndApplicationJson(qid);
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
@@ -107,9 +109,7 @@ public class AnswerController {
 
         answerService.makeAnswerSelectedAndGiveScore(scoreString, qid, aid, loginUserId);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.add("Location", "/questions/{qid}");  // redirect
+        HttpHeaders headers = getHttpHeaderWithRedirectAndApplicationJson(qid);
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 }

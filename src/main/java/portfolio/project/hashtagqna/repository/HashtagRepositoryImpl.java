@@ -33,8 +33,6 @@ public class HashtagRepositoryImpl implements HashtagRepositoryCustom {
                 .select(new QHashtagDto(
                         hashtag.hashtagName)).distinct()
                 .from(hashtag)
-                .join(hashtag.questionHashtags, questionHashtag)
-                .on(hashtag.id.eq(questionHashtag.id))
                 .fetch();
     }
 

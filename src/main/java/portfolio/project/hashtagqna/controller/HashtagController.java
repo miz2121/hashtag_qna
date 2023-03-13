@@ -20,7 +20,7 @@ public class HashtagController {
 
     @GetMapping("/hashtags")
     @ResponseBody
-    public ResponseEntity<List<HashtagDto>> hashtags(Authentication authentication) {
+    public ResponseEntity<List<HashtagDto>> hashtags() {
         List<HashtagDto> hashtagDtos = hashtagService.viewAllHashtags();
         return new ResponseEntity<>(hashtagDtos, HttpStatus.OK);
     }

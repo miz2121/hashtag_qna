@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class QuestionListDto {
+    private Long id;
     private String writer;
     private String title;
     private QuestionStatus questionStatus;
@@ -18,7 +19,8 @@ public class QuestionListDto {
     }
 
     @QueryProjection
-    public QuestionListDto(String writer, String title, QuestionStatus questionStatus, int answerCount, LocalDateTime date) {
+    public QuestionListDto(Long id, String writer, String title, QuestionStatus questionStatus, int answerCount, LocalDateTime date) {
+        this.id = id;
         this.writer = writer;
         this.title = title;
         this.questionStatus = questionStatus;

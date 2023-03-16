@@ -52,6 +52,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     public List<QuestionListDto> viewFiveQuestions() {
         return queryFactory
                 .select(new QQuestionListDto(
+                        question.id,
                         question.writer,
                         question.title,
                         question.questionStatus,
@@ -68,6 +69,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     public Page<QuestionListDto> viewQuestionsPagingOrdering(Pageable pageable) {
         List<QuestionListDto> content = queryFactory
                 .select(new QQuestionListDto(
+                        question.id,
                         question.writer,
                         question.title,
                         question.questionStatus,
@@ -89,6 +91,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     public Page<QuestionListDto> searchForQuestionWriterPagingOrdering(String text, Pageable pageable) {
         List<QuestionListDto> content = queryFactory
                 .select(new QQuestionListDto(
+                        question.id,
                         question.writer,
                         question.title,
                         question.questionStatus,
@@ -111,6 +114,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     public Page<QuestionListDto> searchForAnswerWriterPagingOrdering(String text, Pageable pageable) {
         List<QuestionListDto> content = queryFactory
                 .select(new QQuestionListDto(
+                        question.id,
                         question.writer,
                         question.title,
                         question.questionStatus,
@@ -135,6 +139,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     public Page<QuestionListDto> searchForCommentWriterPagingOrdering(String text, Pageable pageable) {
         List<QuestionListDto> content = queryFactory
                 .select(new QQuestionListDto(
+                        question.id,
                         question.writer,
                         question.title,
                         question.questionStatus,
@@ -164,6 +169,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     public Page<QuestionListDto> searchForTitlePagingOrdering(String text, Pageable pageable) {
         List<QuestionListDto> content = queryFactory
                 .select(new QQuestionListDto(
+                        question.id,
                         question.writer,
                         question.title,
                         question.questionStatus,
@@ -186,6 +192,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     public Page<QuestionListDto> searchForContentPagingOrdering(String text, Pageable pageable) {
         List<QuestionListDto> content = queryFactory
                 .select(new QQuestionListDto(
+                        question.id,
                         question.writer,
                         question.title,
                         question.questionStatus,
@@ -217,6 +224,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     public Page<QuestionListDto> searchForAllPagingOrdering(String text, Pageable pageable) {
         List<QuestionListDto> content = queryFactory
                 .select(new QQuestionListDto(
+                        question.id,
                         question.writer,
                         question.title,
                         question.questionStatus,
@@ -306,6 +314,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     public Page<QuestionListDto> viewMyQuestions(Pageable pageable, Member member) {
         List<QuestionListDto> content = queryFactory
                 .select(new QQuestionListDto(
+                        question.id,
                         question.writer,
                         question.title,
                         question.questionStatus,
@@ -327,6 +336,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     public Page<QuestionListDto> viewMyComments(Pageable pageable, Member member) {
         List<QuestionListDto> content = queryFactory
                 .select(new QQuestionListDto(
+                        question.id,
                         question.writer,
                         question.title,
                         question.questionStatus,
@@ -355,6 +365,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     public Page<QuestionListDto> viewMyAnswers(Pageable pageable, Member member) {
         List<QuestionListDto> content = queryFactory
                 .select(new QQuestionListDto(
+                        question.id,
                         question.writer,
                         question.title,
                         question.questionStatus,
@@ -378,6 +389,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     public Page<QuestionListDto> viewMyHashtags(Pageable pageable, Member member) {
         List<QuestionListDto> content = queryFactory
                 .select(new QQuestionListDto(
+                        question.id,
                         question.writer,
                         question.title,
                         question.questionStatus,
@@ -416,6 +428,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     public Page<QuestionListDto> viewQuestionsByOneHashtag(Pageable pageable, String hashtagName) {
         List<QuestionListDto> content = queryFactory
                 .select(new QQuestionListDto(
+                        question.id,
                         question.writer,
                         question.title,
                         question.questionStatus,

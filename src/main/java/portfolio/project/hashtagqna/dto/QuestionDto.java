@@ -10,6 +10,7 @@ import java.util.List;
 
 @Data
 public class QuestionDto {
+    private Long id;
     private String title;
     private String writer;
     private LocalDateTime date;
@@ -22,7 +23,8 @@ public class QuestionDto {
     }
 
     @QueryProjection
-    public QuestionDto(String title, String writer, LocalDateTime date, String content, QuestionStatus questionStatus, int quCommentCount, int answerCount) {
+    public QuestionDto(Long id, String title, String writer, LocalDateTime date, String content, QuestionStatus questionStatus, int quCommentCount, int answerCount) {
+        this.id = id;
         this.title = title;
         this.writer = writer;
         this.date = date;

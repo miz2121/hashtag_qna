@@ -36,6 +36,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     public QuestionDto viewQuestion(Long id) {
         return queryFactory
                 .select(new QQuestionDto(
+                        question.id,
                         question.title,
                         question.writer,
                         question.date,

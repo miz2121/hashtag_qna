@@ -59,12 +59,17 @@ public class QuestionController {
 
     @GetMapping("/questions/{qid}")
     @ResponseBody
-    public ResponseEntity<QuestionWithHashtagsDto> viewQuestion(@PathVariable Long qid) {
-        QuestionDto questionDto = questionService.viewQuestion(qid);
+    public ResponseEntity<QuestionWithHashtagsDto> viewQuestion(
+            Authentication authentication,
+            @PathVariable Long qid) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        Long loginUserId = principal.getMember().getId();
+
+        QuestionDto questionDto = questionService.viewQuestion(loginUserId, qid);
         List<HashtagDto> hashtagDtos = hashtagService.viewHashtagsAtQuestion(qid);
-        List<AnswerDto> answerDtos = answerService.viewAnswers(qid);
-        List<QuCommentDto> quCommentDtos = quCommentService.viewQuComments(qid);
-        List<AnCommentDto> anCommentDtos = anCommentService.viewAnComments(qid);
+        List<AnswerDto> answerDtos = answerService.viewAnswers(loginUserId, qid);
+        List<QuCommentDto> quCommentDtos = quCommentService.viewQuComments(loginUserId, qid);
+        List<AnCommentDto> anCommentDtos = anCommentService.viewAnComments(loginUserId, qid);
 
         QuestionWithHashtagsDto questionWithHashtagsDto = QuestionWithHashtagsDto.builder()
                 .questionDto(questionDto)

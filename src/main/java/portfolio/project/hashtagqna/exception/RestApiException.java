@@ -6,6 +6,8 @@ import portfolio.project.hashtagqna.exception.code.ErrorCode;
 
 @Getter
 @RequiredArgsConstructor
-public class NotMemberException extends RuntimeException{
+public class RestApiException extends RuntimeException {
+
     private final ErrorCode errorCode;
+
 }

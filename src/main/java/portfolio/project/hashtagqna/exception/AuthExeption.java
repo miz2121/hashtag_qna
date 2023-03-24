@@ -1,22 +1,12 @@
 package portfolio.project.hashtagqna.exception;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import portfolio.project.hashtagqna.exception.code.ErrorCode;
+
+@Getter
+@RequiredArgsConstructor
 public class AuthExeption extends RuntimeException{
-    public AuthExeption() {
-    }
+    private final ErrorCode errorCode;
 
-    public AuthExeption(String message) {
-        super(message);
-    }
-
-    public AuthExeption(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public AuthExeption(Throwable cause) {
-        super(cause);
-    }
-
-    public AuthExeption(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
 }

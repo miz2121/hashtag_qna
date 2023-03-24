@@ -11,6 +11,8 @@ import portfolio.project.hashtagqna.dto.QuestionDto;
 import portfolio.project.hashtagqna.dto.QuestionListDto;
 import portfolio.project.hashtagqna.entity.*;
 import portfolio.project.hashtagqna.exception.AuthExeption;
+import portfolio.project.hashtagqna.exception.RestApiException;
+import portfolio.project.hashtagqna.exception.code.AuthErrorCode;
 import portfolio.project.hashtagqna.repository.*;
 
 import java.util.ArrayList;
@@ -21,7 +23,6 @@ import java.util.Objects;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class QuestionService {
-
     private final QuestionRepository questionRepository;
     private final HashtagRepository hashtagRepository;
     private final QuestionHashtagRepository questionHashtagRepository;
@@ -126,10 +127,10 @@ public class QuestionService {
     @Transactional
     public long updateQuestion(Question oldQuestion, Question editedQuestion, Member questionWriter) {
         if (oldQuestion.getQuestionStatus() == QuestionStatus.CLOSED) {
-            throw new AuthExeption("닫힌 질문은 수정이나 삭제할 수 없습니다.");
+            throw new RestApiException(AuthErrorCode.CLOSED_QUESTION_AUTH);
         }
-        if (oldQuestion.getMember() != questionWriter) {
-            throw new AuthExeption("질문 작성자만이 질문을 수정할 수 있습니다.");
+        if (!Objects.equals(oldQuestion.getMember().getId(), questionWriter.getId())) {
+            throw new RestApiException(AuthErrorCode.EDIT_QUESTION_AUTH);
         }
         return questionRepository.updateQuestion(oldQuestion, editedQuestion);
     }
@@ -139,10 +140,10 @@ public class QuestionService {
         Question question = questionRepository.findQuestionById(questionId);
         Member loginMember = memberRepository.findMemberById(loginMemberId);
         if (question.getQuestionStatus() == QuestionStatus.CLOSED) {
-            throw new AuthExeption("닫힌 질문은 수정이나 삭제할 수 없습니다.");
+            throw new RestApiException(AuthErrorCode.CLOSED_QUESTION_AUTH);
         }
         if (!Objects.equals(question.getMember().getId(), loginMemberId)) {
-            throw new AuthExeption("질문 작성자만이 질문을 삭제할 수 있습니다.");
+            throw new RestApiException(AuthErrorCode.EDIT_QUESTION_AUTH);
         }
 
         for (int i = 0; i < question.getQuestionHashtags().size(); i++) {
@@ -180,8 +181,8 @@ public class QuestionService {
         return questionRepository.viewMyHashtags(pageable, member);
     }
 
-    public QuestionDto viewQuestion(Long id) {
-        return questionRepository.viewQuestion(id);
+    public QuestionDto viewQuestion(Long loginUserId, Long id) {
+        return questionRepository.viewQuestion(loginUserId, id);
     }
 
     public Page<QuestionListDto> viewQuestionsByOneHashtag(Pageable pageable, String hashtagName) {
@@ -190,11 +191,11 @@ public class QuestionService {
         return questionRepository.viewQuestionsByOneHashtag(pageable, hashtagName);
     }
 
-    public QuestionDto showQuestionById(Long id) {
-        return viewQuestion(id);
-    }
-
     public Question findQuestionById(Long id) {
         return questionRepository.findQuestionById(id);
+    }
+
+    public boolean isEditable(Member member, Long questionId){
+        return Objects.equals(member.getId(), questionId);
     }
 }

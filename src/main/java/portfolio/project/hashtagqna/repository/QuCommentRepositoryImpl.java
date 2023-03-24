@@ -1,5 +1,7 @@
 package portfolio.project.hashtagqna.repository;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +12,7 @@ import portfolio.project.hashtagqna.entity.QuComment;
 
 import java.util.List;
 
+import static portfolio.project.hashtagqna.entity.QAnswer.answer;
 import static portfolio.project.hashtagqna.entity.QQuComment.quComment;
 
 public class QuCommentRepositoryImpl implements QuCommentRepositoryCustom {
@@ -22,12 +25,14 @@ public class QuCommentRepositoryImpl implements QuCommentRepositoryCustom {
     }
 
     @Override
-    public List<QuCommentDto> viewQuComments(Long questionId) {
+    public List<QuCommentDto> viewQuComments(Long loginUserId, Long questionId) {
         return queryFactory
                 .select(new QQuCommentDto(
+                        quComment.id,
                         quComment.writer,
                         quComment.date,
-                        quComment.content))
+                        quComment.content,
+                        quCommentWriterIdEq(loginUserId)))
                 .from(quComment)
                 .where(quComment.question.id.eq(questionId))
                 .fetch();
@@ -70,5 +75,9 @@ public class QuCommentRepositoryImpl implements QuCommentRepositoryCustom {
         em.flush();
         em.clear();
         return execute;
+    }
+
+    private BooleanExpression quCommentWriterIdEq(Long loginUserIdCond){
+        return loginUserIdCond != null ? quComment.member.id.eq(loginUserIdCond) : null;
     }
 }

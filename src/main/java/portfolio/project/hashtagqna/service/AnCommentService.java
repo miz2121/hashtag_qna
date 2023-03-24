@@ -7,13 +7,15 @@ import portfolio.project.hashtagqna.dto.AnCommentDto;
 import portfolio.project.hashtagqna.entity.AnComment;
 import portfolio.project.hashtagqna.entity.Answer;
 import portfolio.project.hashtagqna.entity.Member;
-import portfolio.project.hashtagqna.exception.AuthExeption;
+import portfolio.project.hashtagqna.exception.RestApiException;
+import portfolio.project.hashtagqna.exception.code.AuthErrorCode;
 import portfolio.project.hashtagqna.repository.AnCommentRepository;
 import portfolio.project.hashtagqna.repository.AnswerRepository;
 import portfolio.project.hashtagqna.repository.MemberRepository;
 
 import java.util.List;
 import java.util.Objects;
+
 
 @Service
 @RequiredArgsConstructor
@@ -22,8 +24,8 @@ public class AnCommentService {
     private final AnswerRepository answerRepository;
     private final MemberRepository memberRepository;
 
-    public List<AnCommentDto> viewAnComments(Long questionId) {
-        return anCommentRepository.viewAnComments(questionId);
+    public List<AnCommentDto> viewAnComments(Long loginUserId, Long questionId) {
+        return anCommentRepository.viewAnComments(loginUserId, questionId);
     }
 
     @Transactional
@@ -44,7 +46,7 @@ public class AnCommentService {
         AnComment oldAnComment = anCommentRepository.findAnCommentById(anCommentId);
         Member loginMember = memberRepository.findMemberById(loginMemberId);
         if (!Objects.equals(oldAnComment.getMember().getId(), loginMemberId)) {
-            throw new AuthExeption("댓글 작성자만이 댓글을 수정할 수 있습니다.");
+            throw new RestApiException(AuthErrorCode.EDIT_COMMENT_AUTH);
         }
         Answer answer = answerRepository.findAnswerById(answerId);
         AnComment editedAnComment = AnComment.builder()
@@ -60,7 +62,7 @@ public class AnCommentService {
         AnComment anComment = anCommentRepository.findAnCommentById(anCommentId);
         Member loginMember = memberRepository.findMemberById(loginMemberId);
         if (!Objects.equals(anComment.getMember().getId(), loginMemberId)) {
-            throw new AuthExeption("댓글 작성자만이 댓글을 삭제할 수 있습니다.");
+            throw new RestApiException(AuthErrorCode.EDIT_COMMENT_AUTH);
         }
         anComment.getAnswer().decreaseAnCommentCount();
         loginMember.decreaseCommentCount();

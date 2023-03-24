@@ -11,7 +11,7 @@ import portfolio.project.hashtagqna.entity.Question;
 import java.util.List;
 
 public interface QuestionRepositoryCustom {
-    public QuestionDto viewQuestion(Long id);
+    public QuestionDto viewQuestion(Long loginUserId, Long id);
 
     public List<QuestionListDto> viewFiveQuestions();
 

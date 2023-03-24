@@ -18,12 +18,13 @@ public class QuestionDto {
     private QuestionStatus questionStatus;
     private int quCommentCount;
     private int answerCount;
+    private boolean editable;
 
     public QuestionDto() {
     }
 
     @QueryProjection
-    public QuestionDto(Long id, String title, String writer, LocalDateTime date, String content, QuestionStatus questionStatus, int quCommentCount, int answerCount) {
+    public QuestionDto(Long id, String title, String writer, LocalDateTime date, String content, QuestionStatus questionStatus, int quCommentCount, int answerCount, boolean editable) {
         this.id = id;
         this.title = title;
         this.writer = writer;
@@ -32,5 +33,6 @@ public class QuestionDto {
         this.questionStatus = questionStatus;
         this.quCommentCount = quCommentCount;
         this.answerCount = answerCount;
+        this.editable = editable;
     }
 }

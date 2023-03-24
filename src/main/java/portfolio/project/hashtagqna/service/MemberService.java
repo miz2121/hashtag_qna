@@ -5,8 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import portfolio.project.hashtagqna.dto.MemberInfoDto;
 import portfolio.project.hashtagqna.entity.Member;
-import portfolio.project.hashtagqna.exception.AlreadyExistEmailNicknameException;
-import portfolio.project.hashtagqna.exception.NotMemberException;
+import portfolio.project.hashtagqna.exception.RestApiException;
+import portfolio.project.hashtagqna.exception.code.MemberErrorCode;
 import portfolio.project.hashtagqna.repository.*;
 
 import java.util.Optional;
@@ -32,7 +32,7 @@ public class MemberService {
         String nickname = member.getNickname();
         Optional<Long> alreadyExist = Optional.ofNullable(memberRepository.findByEmailNickname(email, nickname));
         if (alreadyExist.isPresent()) {
-            throw new AlreadyExistEmailNicknameException("이메일 혹은 닉네임이 이미 존재합니다.");
+            throw new RestApiException(MemberErrorCode.INFO_ALREADY_EXISTS);
         }
         memberRepository.save(member);
         return true;
@@ -41,7 +41,7 @@ public class MemberService {
     public boolean logIn(String email, String pwd) {
         Optional<Long> findMember = Optional.ofNullable(memberRepository.findMemberByEmailPwd(email, pwd));
         if (findMember.isEmpty()) {
-            throw new NotMemberException("등록된 회원 정보가 없습니다.");
+            throw new RestApiException(MemberErrorCode.NOT_MEMBER);
         }
         return true;
     }
@@ -51,7 +51,7 @@ public class MemberService {
         String nickname = editedMember.getNickname();
         Optional<Long> alreadyExist = Optional.ofNullable(memberRepository.findByNickname(nickname));
         if (alreadyExist.isPresent()) {
-            throw new AlreadyExistEmailNicknameException("닉네임이 이미 존재합니다.");
+            throw new RestApiException(MemberErrorCode.INFO_ALREADY_EXISTS);
         }
         memberRepository.editMember(oldMemberId, editedMember);
         questionRepository.updateNickname(oldMemberId, editedMember);

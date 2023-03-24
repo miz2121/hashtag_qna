@@ -7,7 +7,7 @@ import portfolio.project.hashtagqna.entity.Member;
 import java.util.List;
 
 public interface AnswerRepositoryCustom {
-    public List<AnswerDto> viewAnswers(Long questionId);
+    public List<AnswerDto> viewAnswers(Long loginUserId, Long questionId) ;
     public long removeAnswer(Answer rmAnswer);
     public long updateNickname(Long oldMemberId, Member editedMember);
     public long updateAnswer(Answer oldAnswer, Answer editedAnswer);

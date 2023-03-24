@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 public enum MemberErrorCode implements ErrorCode{
     INACTIVE_MEMBER(HttpStatus.FORBIDDEN, "Member is inactive"),
     NOT_MEMBER(HttpStatus.NOT_FOUND, "Member needs join"),
-    INFO_ALREADY_EXISTS(HttpStatus.CONFLICT, "Email or nickname already exists ");
+    INFO_ALREADY_EXISTS(HttpStatus.CONFLICT, "Email or nickname already exists");
     ;
 
     private final HttpStatus httpStatus;

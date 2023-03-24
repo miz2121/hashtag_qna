@@ -12,6 +12,8 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import portfolio.project.hashtagqna.exception.AlreadyExistEmailNicknameException;
 import portfolio.project.hashtagqna.exception.ErrorResponse;
+import portfolio.project.hashtagqna.exception.RestApiException;
+import portfolio.project.hashtagqna.exception.code.AuthErrorCode;
 import portfolio.project.hashtagqna.exception.code.CommonErrorCode;
 import portfolio.project.hashtagqna.exception.code.ErrorCode;
 import portfolio.project.hashtagqna.logger.PrintLog;
@@ -24,8 +26,8 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     PrintLog printLog = new PrintLog();
 
-    @ExceptionHandler(AlreadyExistEmailNicknameException.class)
-    public ResponseEntity<Object> handleCustomException(AlreadyExistEmailNicknameException e) {
+    @ExceptionHandler(RestApiException.class)
+    public ResponseEntity<Object> handleCustomException(RestApiException e) {
         ErrorCode errorCode = e.getErrorCode();
         return handleExceptionInternal(errorCode);
     }

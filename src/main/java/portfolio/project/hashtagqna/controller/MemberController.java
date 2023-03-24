@@ -11,6 +11,8 @@ import portfolio.project.hashtagqna.dto.HashtagDto;
 import portfolio.project.hashtagqna.dto.MemberDto;
 import portfolio.project.hashtagqna.dto.MemberInfoDto;
 import portfolio.project.hashtagqna.entity.Member;
+import portfolio.project.hashtagqna.exception.RestApiException;
+import portfolio.project.hashtagqna.exception.code.MemberErrorCode;
 import portfolio.project.hashtagqna.service.HashtagService;
 import portfolio.project.hashtagqna.service.MemberService;
 
@@ -44,8 +46,12 @@ public class MemberController {
             Authentication authentication) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
 
-        memberService.logIn(principal.getUsername(), principal.getPassword());
+        boolean result;
+        result = memberService.logIn(principal.getUsername(), principal.getPassword());
 
+        if (!result) {
+            throw new RestApiException(MemberErrorCode.NOT_MEMBER);
+        }
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.add("Location", "/home");  // redirect

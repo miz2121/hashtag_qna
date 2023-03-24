@@ -7,6 +7,8 @@ import portfolio.project.hashtagqna.dto.MemberInfoDto;
 import portfolio.project.hashtagqna.entity.Member;
 import portfolio.project.hashtagqna.exception.RestApiException;
 import portfolio.project.hashtagqna.exception.code.MemberErrorCode;
+import portfolio.project.hashtagqna.logger.Log;
+import portfolio.project.hashtagqna.logger.PrintLog;
 import portfolio.project.hashtagqna.repository.*;
 
 import java.util.Optional;
@@ -21,6 +23,8 @@ public class MemberService {
     private final AnswerRepository answerRepository;
     private final AnCommentRepository anCommentRepository;
     private final QuCommentRepository quCommentRepository;
+
+    PrintLog printLog = new PrintLog();
 
     public Member findMemberById(Long id){
         return memberRepository.findMemberById(id);
@@ -39,11 +43,15 @@ public class MemberService {
     }
 
     public boolean logIn(String email, String pwd) {
-        Optional<Long> findMember = Optional.ofNullable(memberRepository.findMemberByEmailPwd(email, pwd));
-        if (findMember.isEmpty()) {
+        boolean result = false;
+        Long findMember = memberRepository.findMemberByEmailPwd(email, pwd);
+
+        if (findMember == null) {
             throw new RestApiException(MemberErrorCode.NOT_MEMBER);
+        } else{
+            result = true;
         }
-        return true;
+        return result;
     }
 
     @Transactional

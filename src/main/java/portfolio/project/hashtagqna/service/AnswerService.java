@@ -67,7 +67,7 @@ public class AnswerService {
     @Transactional
     public Long updateAnswer(Answer oldAnswer, Answer editedAnswer, Member loginUser, Question question) {
         if (oldAnswer.getMember() != loginUser) {
-            throw new RestApiException(AuthErrorCode.EDIT_QUESTION_AUTH);
+            throw new RestApiException(AuthErrorCode.EDIT_ANSWER_AUTH);
         }
         if (question.getQuestionStatus().equals(QuestionStatus.CLOSED)){
             throw new RestApiException(AuthErrorCode.CLOSED_QUESTION_AUTH);
@@ -82,7 +82,7 @@ public class AnswerService {
         Member loginUser = memberRepository.findMemberById(loginUserId);
 
         if (!Objects.equals(answer.getMember().getId(), loginUserId)) {
-            throw new RestApiException(AuthErrorCode.EDIT_QUESTION_AUTH);
+            throw new RestApiException(AuthErrorCode.EDIT_ANSWER_AUTH);
         }
         if (question.getQuestionStatus().equals(QuestionStatus.CLOSED)){
             throw new RestApiException(AuthErrorCode.CLOSED_QUESTION_AUTH);

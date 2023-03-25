@@ -1,9 +1,7 @@
 package portfolio.project.hashtagqna.repository;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,7 +10,6 @@ import portfolio.project.hashtagqna.dto.QMemberInfoDto;
 import portfolio.project.hashtagqna.entity.Member;
 import portfolio.project.hashtagqna.entity.MemberStatus;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.springframework.util.StringUtils.hasText;
@@ -130,11 +127,11 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
     }
 
     @Override
-    public Long findMemberByEmailPwd(String email, String pwd) {
+    public Long findMemberIdByEmailPwd(String email, String pwd) {
         return queryFactory
                 .select(member.id)
                 .from(member)
-                .where(memberEmailEq(email), memberPwdEq(pwd))
+                .where(memberEmailEq(email).and(memberPwdEq(pwd)))
                 .fetchFirst();
     }
 
@@ -143,6 +140,14 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
         return queryFactory
                 .selectFrom(member)
                 .where(memberEmailEq(email))
+                .fetchFirst();
+    }
+
+    @Override
+    public Member findMemberByEmailPwd(String email, String pwd){
+        return queryFactory
+                .selectFrom(member)
+                .where(memberEmailEq(email).and(memberPwdEq(pwd)))
                 .fetchFirst();
     }
 

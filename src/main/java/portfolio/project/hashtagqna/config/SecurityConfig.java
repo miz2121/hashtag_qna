@@ -1,14 +1,18 @@
 package portfolio.project.hashtagqna.config;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import portfolio.project.hashtagqna.repository.MemberRepository;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
@@ -32,7 +36,13 @@ public class SecurityConfig {
                 .requestMatchers("/members/**").authenticated()
                 .requestMatchers("/questions/**").authenticated()
                 .requestMatchers("/", "/**").permitAll()
-                .anyRequest().permitAll();
+                .anyRequest().permitAll()
+                .and()
+                .exceptionHandling().authenticationEntryPoint(new AuthenticationExceptionHandler());
+        ;
         return http.build();
     }
+
+
+
 }

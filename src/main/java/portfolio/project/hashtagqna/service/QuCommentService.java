@@ -7,7 +7,6 @@ import portfolio.project.hashtagqna.dto.QuCommentDto;
 import portfolio.project.hashtagqna.entity.Member;
 import portfolio.project.hashtagqna.entity.QuComment;
 import portfolio.project.hashtagqna.entity.Question;
-import portfolio.project.hashtagqna.exception.AuthExeption;
 import portfolio.project.hashtagqna.exception.RestApiException;
 import portfolio.project.hashtagqna.exception.code.AuthErrorCode;
 import portfolio.project.hashtagqna.repository.MemberRepository;

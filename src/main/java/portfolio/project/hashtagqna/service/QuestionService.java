@@ -10,7 +10,6 @@ import portfolio.project.hashtagqna.dto.HashtagDto;
 import portfolio.project.hashtagqna.dto.QuestionDto;
 import portfolio.project.hashtagqna.dto.QuestionListDto;
 import portfolio.project.hashtagqna.entity.*;
-import portfolio.project.hashtagqna.exception.AuthExeption;
 import portfolio.project.hashtagqna.exception.RestApiException;
 import portfolio.project.hashtagqna.exception.code.AuthErrorCode;
 import portfolio.project.hashtagqna.repository.*;

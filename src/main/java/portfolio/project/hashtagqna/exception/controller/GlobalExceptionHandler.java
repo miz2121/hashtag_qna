@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import portfolio.project.hashtagqna.exception.AlreadyExistEmailNicknameException;
 import portfolio.project.hashtagqna.exception.ErrorResponse;
 import portfolio.project.hashtagqna.exception.RestApiException;
 import portfolio.project.hashtagqna.exception.code.AuthErrorCode;
@@ -99,4 +98,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .errors(validationErrorList)
                 .build();
     }
+
+
+
 }

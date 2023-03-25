@@ -14,11 +14,12 @@ public class PrincipalDetailsService implements UserDetailsService {
     private final MemberRepository memberRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Member member = memberRepository.findMemberByEmail(email);
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Member member = memberRepository.findMemberByEmail(username);
         if (member == null) {
             throw new UsernameNotFoundException("해당 이메일 정보가 없습니다.");
         }
         return new PrincipalDetails(member);
     }
+
 }

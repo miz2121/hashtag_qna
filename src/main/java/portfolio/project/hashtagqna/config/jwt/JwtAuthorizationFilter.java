@@ -13,7 +13,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import portfolio.project.hashtagqna.config.auth.PrincipalDetails;
 import portfolio.project.hashtagqna.entity.Member;
-import portfolio.project.hashtagqna.exception.AuthExeption;
 import portfolio.project.hashtagqna.logger.PrintLog;
 import portfolio.project.hashtagqna.repository.MemberRepository;
 

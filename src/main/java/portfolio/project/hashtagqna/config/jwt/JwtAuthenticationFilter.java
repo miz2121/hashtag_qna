@@ -8,13 +8,19 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import portfolio.project.hashtagqna.config.auth.PrincipalDetails;
 import portfolio.project.hashtagqna.dto.MemberLoginDto;
+import portfolio.project.hashtagqna.exception.ErrorResponse;
+import portfolio.project.hashtagqna.exception.RestApiException;
+import portfolio.project.hashtagqna.exception.code.ErrorCode;
+import portfolio.project.hashtagqna.exception.code.MemberErrorCode;
 import portfolio.project.hashtagqna.logger.PrintLog;
 
 import java.io.IOException;
@@ -27,22 +33,22 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     public Authentication attemptAuthentication(
             HttpServletRequest request,
-            HttpServletResponse response) throws AuthenticationException {
+            HttpServletResponse response) throws AuthenticationException{
         PrintLog printLog = new PrintLog();
         printLog.printInfoLog("JwtAuthenticationFilter is applied");
         ObjectMapper om = new ObjectMapper();
         MemberLoginDto memberLoginDto = null;
         try {
             memberLoginDto = om.readValue(request.getInputStream(), MemberLoginDto.class);
-            printLog.printInfoLog("memberLoginDto: "+memberLoginDto.toString());
+            printLog.printInfoLog("memberLoginDto: " + memberLoginDto.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(
-                memberLoginDto.getEmail(),
-                memberLoginDto.getPwd()
-        );
+                        memberLoginDto.getEmail(),
+                        memberLoginDto.getPwd()
+                );
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
 //        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();

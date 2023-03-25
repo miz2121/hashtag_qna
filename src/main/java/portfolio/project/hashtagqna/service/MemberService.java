@@ -43,15 +43,12 @@ public class MemberService {
     }
 
     public boolean logIn(String email, String pwd) {
-        boolean result = false;
-        Long findMember = memberRepository.findMemberByEmailPwd(email, pwd);
-
-        if (findMember == null) {
+        Optional<Long> findMember = Optional.ofNullable(memberRepository.findMemberIdByEmailPwd(email, pwd));
+        printLog.printInfoLog("findMember: "+ findMember);
+        if (findMember.isEmpty()) {
             throw new RestApiException(MemberErrorCode.NOT_MEMBER);
-        } else{
-            result = true;
         }
-        return result;
+        return true;
     }
 
     @Transactional

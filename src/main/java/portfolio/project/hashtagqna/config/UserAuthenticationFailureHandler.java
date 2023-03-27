@@ -42,6 +42,7 @@ public class UserAuthenticationFailureHandler implements AuthenticationFailureHa
             status.put("message", "Member needs join" + "");
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
+            response.setStatus(401);
             new ObjectMapper().writeValue(response.getOutputStream(), status);
         }catch (Exception e) {
             throw new RestApiException(MemberErrorCode.NOT_MEMBER);

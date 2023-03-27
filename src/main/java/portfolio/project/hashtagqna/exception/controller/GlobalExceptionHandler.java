@@ -1,9 +1,9 @@
 package portfolio.project.hashtagqna.exception.controller;
 
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,9 +12,9 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import portfolio.project.hashtagqna.exception.ErrorResponse;
 import portfolio.project.hashtagqna.exception.RestApiException;
-import portfolio.project.hashtagqna.exception.code.AuthErrorCode;
 import portfolio.project.hashtagqna.exception.code.CommonErrorCode;
 import portfolio.project.hashtagqna.exception.code.ErrorCode;
+import portfolio.project.hashtagqna.exception.code.MemberErrorCode;
 import portfolio.project.hashtagqna.logger.PrintLog;
 
 import java.util.List;

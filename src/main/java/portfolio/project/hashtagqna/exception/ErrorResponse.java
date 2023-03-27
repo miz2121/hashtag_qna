@@ -22,7 +22,6 @@ public class ErrorResponse {
     @Builder
     @RequiredArgsConstructor
     public static class ValidationError {
-
         private final String field;
         private final String message;
 

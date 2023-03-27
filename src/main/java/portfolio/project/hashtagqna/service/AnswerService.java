@@ -7,10 +7,13 @@ import portfolio.project.hashtagqna.dto.AnswerDto;
 import portfolio.project.hashtagqna.entity.*;
 import portfolio.project.hashtagqna.exception.RestApiException;
 import portfolio.project.hashtagqna.exception.code.AuthErrorCode;
+import portfolio.project.hashtagqna.exception.code.CommonErrorCode;
 import portfolio.project.hashtagqna.repository.AnswerRepository;
 import portfolio.project.hashtagqna.repository.MemberRepository;
 import portfolio.project.hashtagqna.repository.QuestionRepository;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -50,6 +53,12 @@ public class AnswerService {
      */
     @Transactional
     public Long makeAnswerSelectedAndGiveScore(String scoreString, Long questionId, Long answerId, Long loginUserId) {
+        List<String> scoreList = new ArrayList<String>(Arrays.asList("1", "2", "3", "4", "5"));
+        scoreString = scoreString.replaceAll("(\\r\\n|\\r|\\n|\\n\\r)", "").replaceAll(" ", "");
+        if (!scoreList.contains(scoreString)){
+            throw new RestApiException(CommonErrorCode.INVALID_PARAMETER);
+        }
+        
         Question question = questionRepository.findQuestionById(questionId);
         Answer answer = answerRepository.findAnswerById(answerId);
         if (!Objects.equals(question.getMember().getId(), loginUserId)) {

@@ -58,7 +58,7 @@ public class AnswerService {
         if (!scoreList.contains(scoreString)){
             throw new RestApiException(CommonErrorCode.INVALID_PARAMETER);
         }
-        
+
         Question question = questionRepository.findQuestionById(questionId);
         Answer answer = answerRepository.findAnswerById(answerId);
         if (!Objects.equals(question.getMember().getId(), loginUserId)) {

@@ -9,6 +9,7 @@ import portfolio.project.hashtagqna.dto.MemberInfoDto;
 import portfolio.project.hashtagqna.dto.QMemberInfoDto;
 import portfolio.project.hashtagqna.entity.Member;
 import portfolio.project.hashtagqna.entity.MemberStatus;
+import portfolio.project.hashtagqna.entity.QuestionStatus;
 
 import java.util.Optional;
 
@@ -76,6 +77,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                 .set(question.title, message)
                 .set(question.content, message)
                 .set(question.writer, message)
+                .set(question.questionStatus, QuestionStatus.CLOSED)
                 .where(question.member.id.eq(id))
                 .execute();
         em.flush();

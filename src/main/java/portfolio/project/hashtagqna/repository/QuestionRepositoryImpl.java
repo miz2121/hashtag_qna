@@ -99,7 +99,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                         question.title,
                         question.questionStatus,
                         question.answerCount,
-                        question.date))
+                        question.date)).distinct()
                 .from(question)
                 .where(questionWriterCt(text))
                 .offset(pageable.getOffset())
@@ -122,7 +122,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                         question.title,
                         question.questionStatus,
                         question.answerCount,
-                        question.date))
+                        question.date)).distinct()
                 .from(question)
                 .join(question.answers, answer)
                 .on(question.id.eq(answer.question.id))
@@ -147,7 +147,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                         question.title,
                         question.questionStatus,
                         question.answerCount,
-                        question.date))
+                        question.date)).distinct()
                 .from(question)
                 .join(question.quComments, quComment)
                 .on(question.id.eq(quComment.question.id))
@@ -177,7 +177,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                         question.title,
                         question.questionStatus,
                         question.answerCount,
-                        question.date))
+                        question.date)).distinct()
                 .from(question)
                 .where(titleCt(text))
                 .offset(pageable.getOffset())
@@ -193,6 +193,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 
     @Override
     public Page<QuestionListDto> searchForContentPagingOrdering(String text, Pageable pageable) {
+
         List<QuestionListDto> content = queryFactory
                 .select(new QQuestionListDto(
                         question.id,
@@ -200,7 +201,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                         question.title,
                         question.questionStatus,
                         question.answerCount,
-                        question.date))
+                        question.date)).distinct()
                 .from(question)
                 .join(question.quComments, quComment)
                 .on(question.id.eq(quComment.question.id))
@@ -232,7 +233,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                         question.title,
                         question.questionStatus,
                         question.answerCount,
-                        question.date))
+                        question.date)).distinct()
                 .from(question)
                 .join(question.quComments, quComment)
                 .on(question.id.eq(quComment.question.id))

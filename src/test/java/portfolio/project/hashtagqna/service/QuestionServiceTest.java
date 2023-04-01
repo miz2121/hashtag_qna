@@ -38,7 +38,6 @@ class QuestionServiceTest {
         //given
         try {
             Member member = createMember();
-            boolean b = memberService.signIn(member);
             createSixQuestions(member);
         } catch (RestApiException restApiException) {
             printLog.printInfoLog(restApiException.getErrorCode().getMessage());
@@ -54,8 +53,8 @@ class QuestionServiceTest {
 
     private Member createMember() {
         Member member = Member.builder()
-                .email("miz2121@naver.com")
-                .nickname("minsoo")
+                .email("javaTest@naver.com")
+                .nickname("javaTest")
                 .pwd("123")
                 .build();
         memberService.signIn(member);
@@ -64,6 +63,7 @@ class QuestionServiceTest {
 
     private List<Question> createSixQuestions(Member member) {
         List<Question> questions = new ArrayList<>();
+        List<HashtagDto> emptyDtos = new ArrayList<>();
         List<HashtagDto> hashtagDtos = new ArrayList<>();
         for (int i = 0; i < 6; i++) {
             Question question = Question.builder()
@@ -77,7 +77,7 @@ class QuestionServiceTest {
                     .build();
             HashtagDto hashtagDto = new HashtagDto(hashtag.getHashtagName());
             hashtagDtos.add(hashtagDto);
-            questionService.writeQuestion(question, member, null, hashtagDtos);
+            questionService.writeQuestion(question, member, emptyDtos, hashtagDtos);
         }
         return questions;
     }
@@ -87,7 +87,6 @@ class QuestionServiceTest {
         //given
         try {
             Member member = createMember();
-            boolean b = memberService.signIn(member);
             createSixQuestions(member);
         } catch (RestApiException restApiException) {
             printLog.printInfoLog(restApiException.getErrorCode().getMessage());
@@ -107,30 +106,16 @@ class QuestionServiceTest {
         //given
         try {
             Member member = createMember();
-            boolean b = memberService.signIn(member);
             createSixQuestions(member);
         } catch (RestApiException restApiException) {
             printLog.printInfoLog(restApiException.getErrorCode().getMessage());
         }
         PageRequest pageable = PageRequest.of(0, 10);
 
-        //when
-//        Page<QuestionListDto> questionListDtos = questionService.searchForTitlePagingOrdering("4번째", pageable);
-//        Page<QuestionListDto> questionListDtos2 = questionService.searchForQuestionWriterPagingOrdering("minsoo", pageable);
-        Page<QuestionListDto> searchAll = questionService.searchForAllPagingOrdering("테스트", pageable);
-
         //then
-//        for (QuestionListDto questionListDto : questionListDtos) {
-//            printLog.printInfoLog("questionListDto = " + questionListDto);
-//        }
-//        for (QuestionListDto questionListDto : questionListDtos2) {
-//            printLog.printInfoLog("questionListDto = " + questionListDto);
-//        }
-        printLog.printInfoLog("searchAll start!");
-        for (QuestionListDto s : searchAll) {
-            printLog.printInfoLog("searchAll: " + s);
-        }
-        printLog.printInfoLog("searchAll length is: " + searchAll.getContent().size());
+        assertThat((questionService.searchForAllPagingOrdering("4번째", pageable).getContent().size() == 1));
+        assertThat((questionService.searchForAllPagingOrdering("어째서", pageable).getContent().size() == 1));
+        assertThat((questionService.searchForAllPagingOrdering("테스트", pageable).getContent().size() == 10));
     }
 //    @Test
 //    public void 답변채택기능() throws Exception {

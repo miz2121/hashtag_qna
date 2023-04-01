@@ -1,7 +1,6 @@
 package portfolio.project.hashtagqna.repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Page;
@@ -9,7 +8,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import portfolio.project.hashtagqna.dto.*;
-import portfolio.project.hashtagqna.entity.Hashtag;
 import portfolio.project.hashtagqna.entity.Member;
 import portfolio.project.hashtagqna.entity.Question;
 
@@ -179,7 +177,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                         question.answerCount,
                         question.date)).distinct()
                 .from(question)
-                .where(titleCt(text))
+                .where(questionTitleCt(text))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(question.date.desc())
@@ -235,18 +233,24 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                         question.answerCount,
                         question.date)).distinct()
                 .from(question)
-                .join(question.quComments, quComment)
+//                .join(question.quComments, quComment)
+//                .on(question.id.eq(quComment.question.id))
+//                .join(question.answers, answer)
+//                .on(question.id.eq(answer.question.id))
+//                .join(answer.anComments, anComment)
+//                .on(answer.id.eq(anComment.answer.id))
+                .join(quComment.question, question)
                 .on(question.id.eq(quComment.question.id))
-                .join(question.answers, answer)
+                .join(answer.question, question)
                 .on(question.id.eq(answer.question.id))
-                .join(answer.anComments, anComment)
+                .join(anComment.answer, answer)
                 .on(answer.id.eq(anComment.answer.id))
                 .where(
                         questionWriterCt(text)
                                 .or(answerWriterCt(text))
                                 .or(quCommentWriterCt(text))
                                 .or(anCommentWriterCt(text))
-                                .or(titleCt(text))
+                                .or(questionTitleCt(text))
                                 .or(questionContentCt(text))
                                 .or(answerContentCt(text))
                                 .or(quCommentContentCt(text))
@@ -265,25 +269,13 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     @Override
     @Transactional
     public long removeQuestion(Question rmQuestion) {
-        // cascade = CascadeType.REMOVE, orphanRemoval = true을 줬으므로 주석처리
-//        queryFactory
-//                .delete(anComment)
-//                .where(anComment.answer.question.eq(rmQuestion))
-//                .execute();
-//        em.flush();
-//        em.clear();
+
         queryFactory
                 .delete(answer)
                 .where(answer.question.eq(rmQuestion))
                 .execute();
         em.flush();
         em.clear();
-//        queryFactory
-//                .delete(quComment)
-//                .where(quComment.question.eq(rmQuestion))
-//                .execute();
-//        em.flush();
-//        em.clear();
         queryFactory
                 .delete(questionHashtag)
                 .where(questionHashtag.question.eq(rmQuestion))
@@ -455,7 +447,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 
     }
 
-    private BooleanExpression titleCt(String text) {
+    private BooleanExpression questionTitleCt(String text) {
         return text != null ? question.title.containsIgnoreCase(text) : null;
     }
 
@@ -491,7 +483,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
         return writer != null ? anComment.writer.containsIgnoreCase(writer) : null;
     }
 
-    private BooleanExpression questionWriterIdEq(Long loginUserIdCond){
+    private BooleanExpression questionWriterIdEq(Long loginUserIdCond) {
         return loginUserIdCond != null ? question.member.id.eq(loginUserIdCond) : null;
     }
 }

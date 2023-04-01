@@ -53,13 +53,6 @@ public class AnswerRepositoryImpl implements AnswerRepositoryCustom {
     @Override
     @Transactional
     public long removeAnswer(Answer rmAnswer) {
-        // cascade = CascadeType.REMOVE, orphanRemoval = true 을 줬으므로 주석처리
-//        queryFactory
-//                .delete(anComment)
-//                .where(anComment.answer.eq(rmAnswer))
-//                .execute();
-//        em.flush();
-//        em.clear();
         long execute = queryFactory
                 .delete(answer)
                 .where(answer.eq(rmAnswer))

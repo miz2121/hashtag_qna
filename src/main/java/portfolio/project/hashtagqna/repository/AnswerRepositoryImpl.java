@@ -64,10 +64,10 @@ public class AnswerRepositoryImpl implements AnswerRepositoryCustom {
 
     @Override
     @Transactional
-    public long updateNickname(Long oldMemberId, Member editedMember) {
+    public long updateNickname(Long oldMemberId, String nickname) {
         long execute = queryFactory
                 .update(answer)
-                .set(answer.writer, editedMember.getNickname())
+                .set(answer.writer, nickname)
                 .where(answer.member.id.eq(oldMemberId))
                 .execute();
         em.flush();

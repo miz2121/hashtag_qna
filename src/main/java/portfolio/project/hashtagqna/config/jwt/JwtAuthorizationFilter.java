@@ -37,7 +37,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         String header = request.getHeader(JwtProperties.HEADER_STRING);
 
         if (header == null || !header.startsWith(JwtProperties.TOKEN_PREFIX)) {
-            printLog.printInfoLog("\"header is null or header is not bearer token\"");
+            printLog.printInfoLog("\"header is null(maybe login attempt) or header is not bearer token\"");
             chain.doFilter(request, response);
             return;
         }

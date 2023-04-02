@@ -388,10 +388,10 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 
     @Override
     @Transactional
-    public long updateNickname(Long oldMemberId, Member editedMember) {
+    public long updateNickname(Long oldMemberId, String nickname) {
         long execute = queryFactory
                 .update(question)
-                .set(question.writer, editedMember.getNickname())
+                .set(question.writer, nickname)
                 .where(question.member.id.eq(oldMemberId))
                 .execute();
         em.flush();

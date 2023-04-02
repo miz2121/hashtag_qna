@@ -52,10 +52,10 @@ public class QuCommentRepositoryImpl implements QuCommentRepositoryCustom {
 
     @Override
     @Transactional
-    public long updateNickname(Long oldMemberId, Member editedMember) {
+    public long updateNickname(Long oldMemberId, String nickname) {
         long execute = queryFactory
                 .update(quComment)
-                .set(quComment.writer, editedMember.getNickname())
+                .set(quComment.writer, nickname)
                 .where(quComment.member.id.eq(oldMemberId))
                 .execute();
         em.flush();

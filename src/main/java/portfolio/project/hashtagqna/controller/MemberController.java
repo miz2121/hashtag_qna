@@ -10,11 +10,8 @@ import portfolio.project.hashtagqna.config.auth.PrincipalDetails;
 import portfolio.project.hashtagqna.dto.HashtagDto;
 import portfolio.project.hashtagqna.dto.MemberDto;
 import portfolio.project.hashtagqna.dto.MemberInfoDto;
-import portfolio.project.hashtagqna.dto.MemberLoginDto;
+import portfolio.project.hashtagqna.dto.MemberNicknameDto;
 import portfolio.project.hashtagqna.entity.Member;
-import portfolio.project.hashtagqna.exception.RestApiException;
-import portfolio.project.hashtagqna.exception.code.MemberErrorCode;
-import portfolio.project.hashtagqna.logger.PrintLog;
 import portfolio.project.hashtagqna.service.HashtagService;
 import portfolio.project.hashtagqna.service.MemberService;
 
@@ -46,16 +43,9 @@ public class MemberController {
     @PostMapping("/login")
     public ResponseEntity<Object> login(
             Authentication authentication
-//            @RequestBody MemberLoginDto memberLoginDto
             ) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        memberService.logIn(principal.getUsername(), principal.getPassword());
-//        PrintLog printLog = new PrintLog();
-//        printLog.printInfoLog("principal.getUsername(): "+principal.getUsername());
-//        printLog.printInfoLog("principal.getPassword(): "+principal.getPassword());
-//        printLog.printInfoLog("memberLoginDto.getEmail(): "+memberLoginDto.getEmail());
-//        printLog.printInfoLog("memberLoginDto.getPwd()(): "+memberLoginDto.getPwd());
-//        memberService.logIn(memberLoginDto.getEmail(), memberLoginDto.getPwd());
+//        memberService.logIn(principal.getUsername(), principal.getPassword());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -81,23 +71,22 @@ public class MemberController {
     }
 
     @PatchMapping("/members")
-    public ResponseEntity<Object> edit(
+    public ResponseEntity<Object> editNickname(
             Authentication authentication,
-            @RequestBody MemberDto memberDto) {
+            @RequestBody MemberNicknameDto memberNicknameDto) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         Member member = memberService.findMemberById(principal.getMember().getId());
 
         Member editedMember = Member.builder()
                 .email(member.getEmail())
-                .pwd(bCryptPasswordEncoder.encode(memberDto.getPwd()))
-                .nickname(memberDto.getNickname())
+                .pwd(member.getPwd())
+                .nickname(memberNicknameDto.getNickname())
                 .build();
-        memberService.editMember(member.getId(), editedMember);
+        memberService.editNickname(member.getId(), memberNicknameDto.getNickname());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.add("Location", "/home");  // redirect
-        headers.add("Email", memberDto.getEmail());
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 

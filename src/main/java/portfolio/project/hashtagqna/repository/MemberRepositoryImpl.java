@@ -6,7 +6,9 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import org.springframework.transaction.annotation.Transactional;
 import portfolio.project.hashtagqna.dto.MemberInfoDto;
+import portfolio.project.hashtagqna.dto.MemberStatusDto;
 import portfolio.project.hashtagqna.dto.QMemberInfoDto;
+import portfolio.project.hashtagqna.dto.QMemberStatusDto;
 import portfolio.project.hashtagqna.entity.Member;
 import portfolio.project.hashtagqna.entity.MemberStatus;
 import portfolio.project.hashtagqna.entity.QuestionStatus;
@@ -32,12 +34,10 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
 
     @Transactional
     @Override
-    public long editMember(Long oldMemberId, Member edMember) {
+    public long editNickname(Long oldMemberId, String nickname) {
         long execute = queryFactory
                 .update(member)
-                .set(member.email, edMember.getEmail())
-                .set(member.pwd, edMember.getPwd())
-                .set(member.nickname, edMember.getNickname())
+                .set(member.nickname, nickname)
                 .where(member.id.eq(oldMemberId))
                 .execute();
         em.flush();
@@ -128,14 +128,14 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                 .fetchFirst();
     }
 
-    @Override
-    public Long findMemberIdByEmailPwd(String email, String pwd) {
-        return queryFactory
-                .select(member.id)
-                .from(member)
-                .where(memberEmailEq(email).and(memberPwdEq(pwd)))
-                .fetchFirst();
-    }
+//    @Override
+//    public MemberStatusDto findMemberStatusDtoByEmailPwd(String email, String pwd) {
+//        return queryFactory
+//                .select(new QMemberStatusDto(member.id, member.status))
+//                .from(member)
+//                .where(memberEmailEq(email).and(memberPwdEq(pwd)))
+//                .fetchFirst();
+//    }
 
     @Override
     public Member findMemberByEmail(String email) {

@@ -7,7 +7,6 @@ import portfolio.project.hashtagqna.dto.MemberInfoDto;
 import portfolio.project.hashtagqna.entity.Member;
 import portfolio.project.hashtagqna.exception.RestApiException;
 import portfolio.project.hashtagqna.exception.code.MemberErrorCode;
-import portfolio.project.hashtagqna.logger.Log;
 import portfolio.project.hashtagqna.logger.PrintLog;
 import portfolio.project.hashtagqna.repository.*;
 
@@ -42,27 +41,31 @@ public class MemberService {
         return true;
     }
 
-    public boolean logIn(String email, String pwd) {
-        Optional<Long> findMember = Optional.ofNullable(memberRepository.findMemberIdByEmailPwd(email, pwd));
-        printLog.printInfoLog("findMember: "+ findMember);
-        if (findMember.isEmpty()) {
-            throw new RestApiException(MemberErrorCode.NOT_MEMBER);
-        }
-        return true;
-    }
+//    public boolean logIn(String email, String pwd) {
+//        Optional<MemberStatusDto> findMember = Optional.ofNullable(memberRepository.findMemberStatusDtoByEmailPwd(email, pwd));
+//        printLog.printInfoLog("findMember: "+ findMember);
+//        printLog.printInfoLog("findMember.(get()).getMemberStatus(): "+ findMember.get().getMemberStatus());
+//        if (findMember.isEmpty()) {
+//            throw new RestApiException(MemberErrorCode.NOT_MEMBER);
+//        } else if(findMember.get().getMemberStatus() == MemberStatus.INACTIVE){
+//
+//            throw new RestApiException(MemberErrorCode.INACTIVE_MEMBER);
+//        }
+//        return true;
+//    }
 
     @Transactional
-    public long editMember(Long oldMemberId, Member editedMember) {
-        String nickname = editedMember.getNickname();
+    public long editNickname(Long oldMemberId, String nickname) {
+
         Optional<Long> alreadyExist = Optional.ofNullable(memberRepository.findByNickname(nickname));
         if (alreadyExist.isPresent()) {
             throw new RestApiException(MemberErrorCode.INFO_ALREADY_EXISTS);
         }
-        memberRepository.editMember(oldMemberId, editedMember);
-        questionRepository.updateNickname(oldMemberId, editedMember);
-        answerRepository.updateNickname(oldMemberId, editedMember);
-        anCommentRepository.updateNickname(oldMemberId, editedMember);
-        quCommentRepository.updateNickname(oldMemberId, editedMember);
+        memberRepository.editNickname(oldMemberId, nickname);
+        questionRepository.updateNickname(oldMemberId, nickname);
+        answerRepository.updateNickname(oldMemberId, nickname);
+        anCommentRepository.updateNickname(oldMemberId, nickname);
+        quCommentRepository.updateNickname(oldMemberId, nickname);
         return oldMemberId;
     }
 

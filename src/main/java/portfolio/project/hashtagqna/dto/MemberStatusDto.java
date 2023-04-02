@@ -1,16 +1,20 @@
 package portfolio.project.hashtagqna.dto;
 
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
 import portfolio.project.hashtagqna.entity.MemberStatus;
 
 @Data
 public class MemberStatusDto {
+    Long id;
     MemberStatus memberStatus;
 
     public MemberStatusDto() {
     }
 
-    public MemberStatusDto(MemberStatus memberStatus) {
+    @QueryProjection
+    public MemberStatusDto(Long id, MemberStatus memberStatus) {
+        this.id = id;
         this.memberStatus = memberStatus;
     }
 }

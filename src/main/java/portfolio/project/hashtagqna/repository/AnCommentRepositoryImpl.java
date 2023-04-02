@@ -57,10 +57,10 @@ public class AnCommentRepositoryImpl implements AnCommentRepositoryCustom {
 
     @Override
     @Transactional
-    public long updateNickname(Long oldMemberId, Member editedMember) {
+    public long updateNickname(Long oldMemberId, String nickname) {
         long execute = queryFactory
                 .update(anComment)
-                .set(anComment.writer, editedMember.getNickname())
+                .set(anComment.writer, nickname)
                 .where(anComment.member.id.eq(oldMemberId))
                 .execute();
         em.flush();

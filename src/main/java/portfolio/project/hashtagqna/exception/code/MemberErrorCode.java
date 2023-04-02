@@ -7,8 +7,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum MemberErrorCode implements ErrorCode{
-    INACTIVE_MEMBER(HttpStatus.FORBIDDEN, "Member is inactive"),
-    NOT_MEMBER(HttpStatus.UNAUTHORIZED, "Member needs join"),
+//    NOT_MEMBER_OR_INACTIVE(HttpStatus.UNAUTHORIZED, "Member status is inactive or member needs join"),  // userAuthFailureHandler에서 처리함.
     INFO_ALREADY_EXISTS(HttpStatus.CONFLICT, "Email or nickname already exists");
     ;
 

@@ -58,7 +58,8 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                         question.title,
                         question.questionStatus,
                         question.answerCount,
-                        question.date))
+                        question.date
+                ))
                 .from(question)
                 .offset(0)
                 .limit(5)

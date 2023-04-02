@@ -7,10 +7,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import portfolio.project.hashtagqna.config.auth.PrincipalDetails;
-import portfolio.project.hashtagqna.dto.HashtagDto;
-import portfolio.project.hashtagqna.dto.MemberDto;
-import portfolio.project.hashtagqna.dto.MemberInfoDto;
-import portfolio.project.hashtagqna.dto.MemberNicknameDto;
+import portfolio.project.hashtagqna.dto.*;
 import portfolio.project.hashtagqna.entity.Member;
 import portfolio.project.hashtagqna.service.HashtagService;
 import portfolio.project.hashtagqna.service.MemberService;
@@ -107,10 +104,11 @@ public class MemberController {
      */
     @GetMapping("/members/hashtags")
     @ResponseBody
-    public ResponseEntity<List<HashtagDto>> myAllHashtags(Authentication authentication) {
+    public ResponseEntity<MemberHashtagsDto> myAllHashtags(Authentication authentication) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         Long loginMemberId = principal.getMember().getId();
         List<HashtagDto> hashtagDtos = hashtagService.viewAllMyHashtags(loginMemberId);
-        return new ResponseEntity<>(hashtagDtos, HttpStatus.OK);
+        MemberHashtagsDto memberHashtagsDto = new MemberHashtagsDto(hashtagDtos);
+        return new ResponseEntity<>(memberHashtagsDto, HttpStatus.OK);
     }
 }

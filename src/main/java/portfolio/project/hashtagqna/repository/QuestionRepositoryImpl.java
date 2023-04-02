@@ -305,6 +305,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                 .where(question.member.eq(member))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
+                .orderBy(question.date.desc())
                 .fetch();
         Integer total = Math.toIntExact(queryFactory
                 .select(question.count())
@@ -322,15 +323,16 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                         question.title,
                         question.questionStatus,
                         question.answerCount,
-                        question.date))
+                        question.date)).distinct()
                 .from(question)
-                .innerJoin(question.quComments, quComment)
-                .innerJoin(question.answers, answer)
-                .innerJoin(answer.anComments, anComment)
+                .leftJoin(question.quComments, quComment)
+                .leftJoin(question.answers, answer)
+                .leftJoin(answer.anComments, anComment)
                 .where(quComment.member.eq(member)
                         .or(anComment.member.eq(member)))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
+                .orderBy(question.date.desc())
                 .fetch();
         Integer total = Math.toIntExact(queryFactory
                 .select(question.count())
@@ -348,12 +350,13 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                         question.title,
                         question.questionStatus,
                         question.answerCount,
-                        question.date))
+                        question.date)).distinct()
                 .from(question)
                 .innerJoin(question.answers, answer)
                 .where(answer.member.eq(member))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
+                .orderBy(question.date.desc())
                 .fetch();
         Integer total = Math.toIntExact(queryFactory
                 .select(question.count())
@@ -371,13 +374,14 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                         question.title,
                         question.questionStatus,
                         question.answerCount,
-                        question.date))
+                        question.date)).distinct()
                 .from(question)
                 .innerJoin(question.questionHashtags, questionHashtag)
                 .innerJoin(questionHashtag.hashtag, hashtag)
                 .where(hashtag.member.eq(member))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
+                .orderBy(question.date.desc())
                 .fetch();
         Integer total = Math.toIntExact(queryFactory
                 .select(question.count())
@@ -415,6 +419,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                 .where(hashtag.hashtagName.eq(hashtagName))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
+                .orderBy(question.date.desc())
                 .fetch();
         Integer total = Math.toIntExact(queryFactory
                 .select(question.count())

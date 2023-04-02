@@ -104,11 +104,11 @@ public class MemberController {
      */
     @GetMapping("/members/hashtags")
     @ResponseBody
-    public ResponseEntity<MemberHashtagsDto> myAllHashtags(Authentication authentication) {
+    public ResponseEntity<HashtagListDto> myAllHashtags(Authentication authentication) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         Long loginMemberId = principal.getMember().getId();
         List<HashtagDto> hashtagDtos = hashtagService.viewAllMyHashtags(loginMemberId);
-        MemberHashtagsDto memberHashtagsDto = new MemberHashtagsDto(hashtagDtos);
+        HashtagListDto memberHashtagsDto = new HashtagListDto(hashtagDtos);
         return new ResponseEntity<>(memberHashtagsDto, HttpStatus.OK);
     }
 }

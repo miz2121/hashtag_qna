@@ -6,13 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class MemberHashtagsDto {
+public class HashtagListDto {
     private List<HashtagDto> hashtagDtos = new ArrayList<>();
 
-    public MemberHashtagsDto() {
+    public HashtagListDto() {
     }
 
-    public MemberHashtagsDto(List<HashtagDto> hashtagDtos) {
+    public HashtagListDto(List<HashtagDto> hashtagDtos) {
         this.hashtagDtos = hashtagDtos;
     }
 }

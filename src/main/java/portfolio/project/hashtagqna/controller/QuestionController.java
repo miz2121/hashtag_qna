@@ -13,9 +13,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import portfolio.project.hashtagqna.config.auth.PrincipalDetails;
 import portfolio.project.hashtagqna.dto.*;
-import portfolio.project.hashtagqna.entity.Hashtag;
 import portfolio.project.hashtagqna.entity.Member;
 import portfolio.project.hashtagqna.entity.Question;
+import portfolio.project.hashtagqna.logger.PrintLog;
 import portfolio.project.hashtagqna.repository.QuestionRepository;
 import portfolio.project.hashtagqna.service.*;
 
@@ -31,7 +31,6 @@ public class QuestionController {
     private final AnswerService answerService;
     private final QuCommentService quCommentService;
     private final AnCommentService anCommentService;
-    private final QuestionRepository questionRepository;
 
     @PostMapping("/questions")
     public ResponseEntity<Object> createQuestion(
@@ -59,7 +58,7 @@ public class QuestionController {
 
     @GetMapping("/questions/{qid}")
     @ResponseBody
-    public ResponseEntity<QuestionWithHashtagsDto> viewQuestion(
+    public ResponseEntity<QuestionDetailDto> viewQuestion(
             Authentication authentication,
             @PathVariable Long qid) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
@@ -71,66 +70,101 @@ public class QuestionController {
         List<QuCommentDto> quCommentDtos = quCommentService.viewQuComments(loginUserId, qid);
         List<AnCommentDto> anCommentDtos = anCommentService.viewAnComments(loginUserId, qid);
 
-        QuestionWithHashtagsDto questionWithHashtagsDto = QuestionWithHashtagsDto.builder()
+        QuestionDetailDto questionDetailDto = QuestionDetailDto.builder()
                 .questionDto(questionDto)
                 .hashtagDtos(hashtagDtos)
                 .answerDtos(answerDtos)
                 .quCommentDtos(quCommentDtos)
                 .anCommentDtos(anCommentDtos)
                 .build();
-        return new ResponseEntity<>(questionWithHashtagsDto, HttpStatus.OK);
+        return new ResponseEntity<>(questionDetailDto, HttpStatus.OK);
     }
 
     @GetMapping("/questions")
     @ResponseBody
-    public ResponseEntity<Page<QuestionListDto>> viewQuestions(
+    public ResponseEntity<QuestionWithHashtagsListDto> viewQuestions(
             @PageableDefault(size = 10) Pageable pageable) {
         Page<QuestionListDto> questionListDtos = questionService.viewQuestionsPagingOrdering(pageable);
-        return new ResponseEntity<>(questionListDtos, HttpStatus.OK);
+        List<HashtagListDto> hashtagListDtoList = new ArrayList<>();
+        for (QuestionListDto q : questionListDtos) {
+            List<HashtagDto> hashtagDtos = hashtagService.viewHashtagsAtQuestion(q.getId());
+            HashtagListDto hashtagListDto = new HashtagListDto(hashtagDtos);
+            hashtagListDtoList.add(hashtagListDto);
+        }
+        QuestionWithHashtagsListDto questionWithHashtagsListDto = new QuestionWithHashtagsListDto(questionListDtos, hashtagListDtoList);
+        return new ResponseEntity<>(questionWithHashtagsListDto, HttpStatus.OK);
     }
 
     @GetMapping("/questions/searchQuestionWriter")
     @ResponseBody
-    public ResponseEntity<Page<QuestionListDto>> searchQuestionWriter(
+    public ResponseEntity<QuestionWithHashtagsListDto> searchQuestionWriter(
             @RequestParam(value = "text", required = false, defaultValue = "") String text,
             @PageableDefault(
                     size = 10
             ) Pageable pageable) {
         Page<QuestionListDto> questionListDtos = questionService.searchForQuestionWriterPagingOrdering(text, pageable);
-        return new ResponseEntity<>(questionListDtos, HttpStatus.OK);
+        List<HashtagListDto> hashtagListDtoList = new ArrayList<>();
+        for (QuestionListDto q : questionListDtos) {
+            List<HashtagDto> hashtagDtos = hashtagService.viewHashtagsAtQuestion(q.getId());
+            HashtagListDto hashtagListDto = new HashtagListDto(hashtagDtos);
+            hashtagListDtoList.add(hashtagListDto);
+        }
+        QuestionWithHashtagsListDto questionWithHashtagsListDto = new QuestionWithHashtagsListDto(questionListDtos, hashtagListDtoList);
+        return new ResponseEntity<>(questionWithHashtagsListDto, HttpStatus.OK);
     }
 
     @GetMapping("/questions/searchAnswerWriter")
     @ResponseBody
-    public ResponseEntity<Page<QuestionListDto>> searchAnswerWriter(
+    public ResponseEntity<QuestionWithHashtagsListDto> searchAnswerWriter(
             @RequestParam(value = "text", required = false, defaultValue = "") String text,
             @PageableDefault(
                     size = 10
             ) Pageable pageable) {
         Page<QuestionListDto> questionListDtos = questionService.searchForAnswerWriterPagingOrdering(text, pageable);
-        return new ResponseEntity<>(questionListDtos, HttpStatus.OK);
+        List<HashtagListDto> hashtagListDtoList = new ArrayList<>();
+        for (QuestionListDto q : questionListDtos) {
+            List<HashtagDto> hashtagDtos = hashtagService.viewHashtagsAtQuestion(q.getId());
+            HashtagListDto hashtagListDto = new HashtagListDto(hashtagDtos);
+            hashtagListDtoList.add(hashtagListDto);
+        }
+        QuestionWithHashtagsListDto questionWithHashtagsListDto = new QuestionWithHashtagsListDto(questionListDtos, hashtagListDtoList);
+        return new ResponseEntity<>(questionWithHashtagsListDto, HttpStatus.OK);
     }
 
     @GetMapping("/questions/searchCommentWriter")
     @ResponseBody
-    public ResponseEntity<Page<QuestionListDto>> searchCommentWriter(
+    public ResponseEntity<QuestionWithHashtagsListDto> searchCommentWriter(
             @RequestParam(value = "text", required = false, defaultValue = "") String text,
             @PageableDefault(
                     size = 10
             ) Pageable pageable) {
         Page<QuestionListDto> questionListDtos = questionService.searchForCommentWriterPagingOrdering(text, pageable);
-        return new ResponseEntity<>(questionListDtos, HttpStatus.OK);
+        List<HashtagListDto> hashtagListDtoList = new ArrayList<>();
+        for (QuestionListDto q : questionListDtos) {
+            List<HashtagDto> hashtagDtos = hashtagService.viewHashtagsAtQuestion(q.getId());
+            HashtagListDto hashtagListDto = new HashtagListDto(hashtagDtos);
+            hashtagListDtoList.add(hashtagListDto);
+        }
+        QuestionWithHashtagsListDto questionWithHashtagsListDto = new QuestionWithHashtagsListDto(questionListDtos, hashtagListDtoList);
+        return new ResponseEntity<>(questionWithHashtagsListDto, HttpStatus.OK);
     }
 
     @GetMapping("/questions/searchTitle")
     @ResponseBody
-    public ResponseEntity<Page<QuestionListDto>> searchTitle(
+    public ResponseEntity<QuestionWithHashtagsListDto> searchTitle(
             @RequestParam(value = "text", required = false, defaultValue = "") String text,
             @PageableDefault(
                     size = 10
             ) Pageable pageable) {
         Page<QuestionListDto> questionListDtos = questionService.searchForTitlePagingOrdering(text, pageable);
-        return new ResponseEntity<>(questionListDtos, HttpStatus.OK);
+        List<HashtagListDto> hashtagListDtoList = new ArrayList<>();
+        for (QuestionListDto q : questionListDtos) {
+            List<HashtagDto> hashtagDtos = hashtagService.viewHashtagsAtQuestion(q.getId());
+            HashtagListDto hashtagListDto = new HashtagListDto(hashtagDtos);
+            hashtagListDtoList.add(hashtagListDto);
+        }
+        QuestionWithHashtagsListDto questionWithHashtagsListDto = new QuestionWithHashtagsListDto(questionListDtos, hashtagListDtoList);
+        return new ResponseEntity<>(questionWithHashtagsListDto, HttpStatus.OK);
     }
 
     /**
@@ -142,72 +176,114 @@ public class QuestionController {
      */
     @GetMapping("/questions/searchContent")
     @ResponseBody
-    public ResponseEntity<Page<QuestionListDto>> searchContent(
+    public ResponseEntity<QuestionWithHashtagsListDto> searchContent(
             @RequestParam(value = "text", required = false, defaultValue = "") String text,
             @PageableDefault(
                     size = 10
             ) Pageable pageable) {
         Page<QuestionListDto> questionListDtos = questionService.searchForContentPagingOrdering(text, pageable);
-        return new ResponseEntity<>(questionListDtos, HttpStatus.OK);
+        List<HashtagListDto> hashtagListDtoList = new ArrayList<>();
+        for (QuestionListDto q : questionListDtos) {
+            List<HashtagDto> hashtagDtos = hashtagService.viewHashtagsAtQuestion(q.getId());
+            HashtagListDto hashtagListDto = new HashtagListDto(hashtagDtos);
+            hashtagListDtoList.add(hashtagListDto);
+        }
+        QuestionWithHashtagsListDto questionWithHashtagsListDto = new QuestionWithHashtagsListDto(questionListDtos, hashtagListDtoList);
+        return new ResponseEntity<>(questionWithHashtagsListDto, HttpStatus.OK);
     }
 
     @GetMapping("/questions/searchAll")
     @ResponseBody
-    public ResponseEntity<Page<QuestionListDto>> searchAll(
+    public ResponseEntity<QuestionWithHashtagsListDto> searchAll(
             @RequestParam(value = "text", required = false, defaultValue = "") String text,
             @PageableDefault(
                     size = 10
             ) Pageable pageable) {
         Page<QuestionListDto> questionListDtos = questionService.searchForAllPagingOrdering(text, pageable);
-        return new ResponseEntity<>(questionListDtos, HttpStatus.OK);
+        List<HashtagListDto> hashtagListDtoList = new ArrayList<>();
+        for (QuestionListDto q : questionListDtos) {
+            List<HashtagDto> hashtagDtos = hashtagService.viewHashtagsAtQuestion(q.getId());
+            HashtagListDto hashtagListDto = new HashtagListDto(hashtagDtos);
+            hashtagListDtoList.add(hashtagListDto);
+        }
+        QuestionWithHashtagsListDto questionWithHashtagsListDto = new QuestionWithHashtagsListDto(questionListDtos, hashtagListDtoList);
+        return new ResponseEntity<>(questionWithHashtagsListDto, HttpStatus.OK);
     }
 
     @GetMapping("/questions/myQuestions")
     @ResponseBody
-    public ResponseEntity<Page<QuestionListDto>> viewMyQuestions(
+    public ResponseEntity<QuestionWithHashtagsListDto> viewMyQuestions(
             Authentication authentication,
             @PageableDefault(size = 10) Pageable pageable) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         Member member = memberService.findMemberById(principal.getMember().getId());
 
         Page<QuestionListDto> questionListDtos = questionService.viewMyQuestions(pageable, member);
-        return new ResponseEntity<>(questionListDtos, HttpStatus.OK);
+        List<HashtagListDto> hashtagListDtoList = new ArrayList<>();
+        for (QuestionListDto q : questionListDtos) {
+            List<HashtagDto> hashtagDtos = hashtagService.viewHashtagsAtQuestion(q.getId());
+            HashtagListDto hashtagListDto = new HashtagListDto(hashtagDtos);
+            hashtagListDtoList.add(hashtagListDto);
+        }
+        QuestionWithHashtagsListDto questionWithHashtagsListDto = new QuestionWithHashtagsListDto(questionListDtos, hashtagListDtoList);
+        return new ResponseEntity<>(questionWithHashtagsListDto, HttpStatus.OK);
     }
 
     @GetMapping("/questions/myComments")
     @ResponseBody
-    public ResponseEntity<Page<QuestionListDto>> viewMyComments(
+    public ResponseEntity<QuestionWithHashtagsListDto> viewMyComments(
             Authentication authentication,
             @PageableDefault(size = 10) Pageable pageable) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         Member member = memberService.findMemberById(principal.getMember().getId());
-
         Page<QuestionListDto> questionListDtos = questionService.viewMyComments(pageable, member);
-        return new ResponseEntity<>(questionListDtos, HttpStatus.OK);
+
+        List<HashtagListDto> hashtagListDtoList = new ArrayList<>();
+        for (QuestionListDto q : questionListDtos) {
+            List<HashtagDto> hashtagDtos = hashtagService.viewHashtagsAtQuestion(q.getId());
+            HashtagListDto hashtagListDto = new HashtagListDto(hashtagDtos);
+            hashtagListDtoList.add(hashtagListDto);
+        }
+        QuestionWithHashtagsListDto questionWithHashtagsListDto = new QuestionWithHashtagsListDto(questionListDtos, hashtagListDtoList);
+        return new ResponseEntity<>(questionWithHashtagsListDto, HttpStatus.OK);
     }
 
     @GetMapping("/questions/myAnswers")
     @ResponseBody
-    public ResponseEntity<Page<QuestionListDto>> viewMyAnswers(
+    public ResponseEntity<QuestionWithHashtagsListDto> viewMyAnswers(
             Authentication authentication,
             @PageableDefault(size = 10) Pageable pageable) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         Member member = memberService.findMemberById(principal.getMember().getId());
 
         Page<QuestionListDto> questionListDtos = questionService.viewMyAnswers(pageable, member);
-        return new ResponseEntity<>(questionListDtos, HttpStatus.OK);
+        List<HashtagListDto> hashtagListDtoList = new ArrayList<>();
+        for (QuestionListDto q : questionListDtos) {
+            List<HashtagDto> hashtagDtos = hashtagService.viewHashtagsAtQuestion(q.getId());
+            HashtagListDto hashtagListDto = new HashtagListDto(hashtagDtos);
+            hashtagListDtoList.add(hashtagListDto);
+        }
+        QuestionWithHashtagsListDto questionWithHashtagsListDto = new QuestionWithHashtagsListDto(questionListDtos, hashtagListDtoList);
+        return new ResponseEntity<>(questionWithHashtagsListDto, HttpStatus.OK);
     }
 
     @GetMapping("/questions/myHashtags")
     @ResponseBody
-    public ResponseEntity<Page<QuestionListDto>> viewMyHashtags(
+    public ResponseEntity<QuestionWithHashtagsListDto> viewMyHashtags(
             Authentication authentication,
             @PageableDefault(size = 10) Pageable pageable) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         Member member = memberService.findMemberById(principal.getMember().getId());
 
         Page<QuestionListDto> questionListDtos = questionService.viewMyHashtags(pageable, member);
-        return new ResponseEntity<>(questionListDtos, HttpStatus.OK);
+        List<HashtagListDto> hashtagListDtoList = new ArrayList<>();
+        for (QuestionListDto q : questionListDtos) {
+            List<HashtagDto> hashtagDtos = hashtagService.viewHashtagsAtQuestion(q.getId());
+            HashtagListDto hashtagListDto = new HashtagListDto(hashtagDtos);
+            hashtagListDtoList.add(hashtagListDto);
+        }
+        QuestionWithHashtagsListDto questionWithHashtagsListDto = new QuestionWithHashtagsListDto(questionListDtos, hashtagListDtoList);
+        return new ResponseEntity<>(questionWithHashtagsListDto, HttpStatus.OK);
     }
 
     @PostMapping("/questions/remove/{qid}")
@@ -254,10 +330,17 @@ public class QuestionController {
      */
     @GetMapping("/questions/hashtag")
     @ResponseBody
-    public ResponseEntity<Page<QuestionListDto>> viewQuestionsByOneHashtag(
+    public ResponseEntity<QuestionWithHashtagsListDto> viewQuestionsByOneHashtag(
             @PageableDefault(size = 10) Pageable pageable,
             @RequestParam(value = "text", required = false, defaultValue = "") String text) {
         Page<QuestionListDto> questionListDtos = questionService.viewQuestionsByOneHashtag(pageable, text);
-        return new ResponseEntity<>(questionListDtos, HttpStatus.OK);
+        List<HashtagListDto> hashtagListDtoList = new ArrayList<>();
+        for (QuestionListDto q : questionListDtos) {
+            List<HashtagDto> hashtagDtos = hashtagService.viewHashtagsAtQuestion(q.getId());
+            HashtagListDto hashtagListDto = new HashtagListDto(hashtagDtos);
+            hashtagListDtoList.add(hashtagListDto);
+        }
+        QuestionWithHashtagsListDto questionWithHashtagsListDto = new QuestionWithHashtagsListDto(questionListDtos, hashtagListDtoList);
+        return new ResponseEntity<>(questionWithHashtagsListDto, HttpStatus.OK);
     }
 }

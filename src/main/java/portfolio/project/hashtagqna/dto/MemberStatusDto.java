@@ -6,8 +6,8 @@ import portfolio.project.hashtagqna.entity.MemberStatus;
 
 @Data
 public class MemberStatusDto {
-    Long id;
-    MemberStatus memberStatus;
+    private Long id;
+    private MemberStatus memberStatus;
 
     public MemberStatusDto() {
     }

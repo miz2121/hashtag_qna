@@ -7,12 +7,12 @@ import java.util.List;
 
 @Data
 public class HashtagListDto {
-    private List<HashtagDto> hashtagDtos = new ArrayList<>();
+    private List<HashtagDto> hashtagDtoList = new ArrayList<>();
 
     public HashtagListDto() {
     }
 
-    public HashtagListDto(List<HashtagDto> hashtagDtos) {
-        this.hashtagDtos = hashtagDtos;
+    public HashtagListDto(List<HashtagDto> hashtagDtoList) {
+        this.hashtagDtoList = hashtagDtoList;
     }
 }

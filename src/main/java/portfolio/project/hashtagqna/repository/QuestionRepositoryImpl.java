@@ -108,6 +108,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
         Integer total = Math.toIntExact(queryFactory
                 .select(question.count())
                 .from(question)
+                .where(questionWriterCt(text))
                 .fetchOne());
         return new PageImpl<>(content, pageable, total);
     }
@@ -132,6 +133,8 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
         Integer total = Math.toIntExact(queryFactory
                 .select(question.count())
                 .from(question)
+                .leftJoin(question.answers, answer)
+                .where(answerWriterCt(text))
                 .fetchOne());
         return new PageImpl<>(content, pageable, total);
     }
@@ -159,6 +162,11 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
         Integer total = Math.toIntExact(queryFactory
                 .select(question.count())
                 .from(question)
+                .leftJoin(question.quComments, quComment)
+                .leftJoin(question.answers, answer)
+                .leftJoin(answer.anComments, anComment)
+                .where(quCommentWriterCt(text).
+                        or(anCommentWriterCt(text)))
                 .fetchOne());
         return new PageImpl<>(content, pageable, total);
     }
@@ -182,6 +190,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
         Integer total = Math.toIntExact(queryFactory
                 .select(question.count())
                 .from(question)
+                .where(questionTitleCt(text))
                 .fetchOne());
         return new PageImpl<>(content, pageable, total);
     }
@@ -212,6 +221,13 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
         Integer total = Math.toIntExact(queryFactory
                 .select(question.count())
                 .from(question)
+                .leftJoin(question.quComments, quComment)
+                .leftJoin(question.answers, answer)
+                .leftJoin(answer.anComments, anComment)
+                .where(questionContentCt(text)
+                        .or(answerContentCt(text))
+                        .or(quCommentContentCt(text))
+                        .or(anCommentContentCt(text)))
                 .fetchOne());
         return new PageImpl<>(content, pageable, total);
     }
@@ -248,6 +264,20 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
         Integer total = Math.toIntExact(queryFactory
                 .select(question.count())
                 .from(question)
+                .leftJoin(question.quComments, quComment)
+                .leftJoin(question.answers, answer)
+                .leftJoin(answer.anComments, anComment)
+                .where(
+                        questionWriterCt(text)
+                                .or(answerWriterCt(text))
+                                .or(quCommentWriterCt(text))
+                                .or(anCommentWriterCt(text))
+                                .or(questionTitleCt(text))
+                                .or(questionContentCt(text))
+                                .or(answerContentCt(text))
+                                .or(quCommentContentCt(text))
+                                .or(anCommentContentCt(text))
+                )
                 .fetchOne());
         return new PageImpl<>(content, pageable, total);
     }

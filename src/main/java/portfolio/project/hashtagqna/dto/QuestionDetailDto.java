@@ -6,19 +6,22 @@ import lombok.Data;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 질문글 하나 클릭했을 때 필요한 DTO
+ */
 @Data
-public class QuestionWithHashtagsDto {
+public class QuestionDetailDto {
     private QuestionDto questionDto;
     private List<HashtagDto> hashtagDtos = new ArrayList<>();
     private List<AnswerDto> answerDtos = new ArrayList<>();
     private List<QuCommentDto> quCommentDtos = new ArrayList<>();
     private List<AnCommentDto> anCommentDtos = new ArrayList<>();
 
-    public QuestionWithHashtagsDto() {
+    public QuestionDetailDto() {
     }
 
     @Builder
-    public QuestionWithHashtagsDto(QuestionDto questionDto, List<HashtagDto> hashtagDtos, List<AnswerDto> answerDtos, List<QuCommentDto> quCommentDtos, List<AnCommentDto> anCommentDtos) {
+    public QuestionDetailDto(QuestionDto questionDto, List<HashtagDto> hashtagDtos, List<AnswerDto> answerDtos, List<QuCommentDto> quCommentDtos, List<AnCommentDto> anCommentDtos) {
         this.questionDto = questionDto;
         this.hashtagDtos = hashtagDtos;
         this.answerDtos = answerDtos;

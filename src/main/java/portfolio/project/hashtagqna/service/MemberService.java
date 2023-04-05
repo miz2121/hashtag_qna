@@ -5,8 +5,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import portfolio.project.hashtagqna.dto.MemberInfoDto;
 import portfolio.project.hashtagqna.entity.Member;
-import portfolio.project.hashtagqna.exception.AlreadyExistEmailNicknameException;
-import portfolio.project.hashtagqna.exception.NotMemberException;
+import portfolio.project.hashtagqna.exception.RestApiException;
+import portfolio.project.hashtagqna.exception.code.MemberErrorCode;
+import portfolio.project.hashtagqna.logger.PrintLog;
 import portfolio.project.hashtagqna.repository.*;
 
 import java.util.Optional;
@@ -22,6 +23,8 @@ public class MemberService {
     private final AnCommentRepository anCommentRepository;
     private final QuCommentRepository quCommentRepository;
 
+    PrintLog printLog = new PrintLog();
+
     public Member findMemberById(Long id){
         return memberRepository.findMemberById(id);
     }
@@ -32,32 +35,37 @@ public class MemberService {
         String nickname = member.getNickname();
         Optional<Long> alreadyExist = Optional.ofNullable(memberRepository.findByEmailNickname(email, nickname));
         if (alreadyExist.isPresent()) {
-            throw new AlreadyExistEmailNicknameException("이메일 혹은 닉네임이 이미 존재합니다.");
+            throw new RestApiException(MemberErrorCode.INFO_ALREADY_EXISTS);
         }
         memberRepository.save(member);
         return true;
     }
 
-    public boolean logIn(String email, String pwd) {
-        Optional<Long> findMember = Optional.ofNullable(memberRepository.findMemberByEmailPwd(email, pwd));
-        if (findMember.isEmpty()) {
-            throw new NotMemberException("등록된 회원 정보가 없습니다.");
-        }
-        return true;
-    }
+//    public boolean logIn(String email, String pwd) {
+//        Optional<MemberStatusDto> findMember = Optional.ofNullable(memberRepository.findMemberStatusDtoByEmailPwd(email, pwd));
+//        printLog.printInfoLog("findMember: "+ findMember);
+//        printLog.printInfoLog("findMember.(get()).getMemberStatus(): "+ findMember.get().getMemberStatus());
+//        if (findMember.isEmpty()) {
+//            throw new RestApiException(MemberErrorCode.NOT_MEMBER);
+//        } else if(findMember.get().getMemberStatus() == MemberStatus.INACTIVE){
+//
+//            throw new RestApiException(MemberErrorCode.INACTIVE_MEMBER);
+//        }
+//        return true;
+//    }
 
     @Transactional
-    public long editMember(Long oldMemberId, Member editedMember) {
-        String nickname = editedMember.getNickname();
+    public long editNickname(Long oldMemberId, String nickname) {
+
         Optional<Long> alreadyExist = Optional.ofNullable(memberRepository.findByNickname(nickname));
         if (alreadyExist.isPresent()) {
-            throw new AlreadyExistEmailNicknameException("닉네임이 이미 존재합니다.");
+            throw new RestApiException(MemberErrorCode.INFO_ALREADY_EXISTS);
         }
-        memberRepository.editMember(oldMemberId, editedMember);
-        questionRepository.updateNickname(oldMemberId, editedMember);
-        answerRepository.updateNickname(oldMemberId, editedMember);
-        anCommentRepository.updateNickname(oldMemberId, editedMember);
-        quCommentRepository.updateNickname(oldMemberId, editedMember);
+        memberRepository.editNickname(oldMemberId, nickname);
+        questionRepository.updateNickname(oldMemberId, nickname);
+        answerRepository.updateNickname(oldMemberId, nickname);
+        anCommentRepository.updateNickname(oldMemberId, nickname);
+        quCommentRepository.updateNickname(oldMemberId, nickname);
         return oldMemberId;
     }
 

@@ -33,8 +33,6 @@ public class HashtagRepositoryImpl implements HashtagRepositoryCustom {
                 .select(new QHashtagDto(
                         hashtag.hashtagName)).distinct()
                 .from(hashtag)
-                .join(hashtag.questionHashtags, questionHashtag)
-                .on(hashtag.id.eq(questionHashtag.id))
                 .fetch();
     }
 
@@ -44,9 +42,7 @@ public class HashtagRepositoryImpl implements HashtagRepositoryCustom {
                 .select(new QHashtagDto(
                         hashtag.hashtagName)).distinct()
                 .from(hashtag)
-                .join(hashtag.questionHashtags, questionHashtag)
-                .on(hashtag.id.eq(questionHashtag.id))
-                ;
+                .innerJoin(hashtag.questionHashtags, questionHashtag);
 
         BooleanBuilder builder = new BooleanBuilder();
         for (HashtagDto ht : hashtags) {
@@ -63,8 +59,7 @@ public class HashtagRepositoryImpl implements HashtagRepositoryCustom {
                 .select(new QHashtagDto(
                         hashtag.hashtagName)).distinct()
                 .from(hashtag)
-                .join(hashtag.questionHashtags, questionHashtag)
-                .on(hashtag.id.eq(questionHashtag.id))
+                .innerJoin(hashtag.questionHashtags, questionHashtag)
                 .where(hashtag.member.eq(member))
                 .fetch();
     }
@@ -76,8 +71,7 @@ public class HashtagRepositoryImpl implements HashtagRepositoryCustom {
                                 hashtag.hashtagName)
                 ).distinct()
                 .from(hashtag)
-                .join(hashtag.questionHashtags, questionHashtag)
-                .on(hashtag.id.eq(questionHashtag.hashtag.id))
+                .innerJoin(hashtag.questionHashtags, questionHashtag)
                 .where(questionHashtag.question.id.eq(questionId))
                 .fetch();
     }

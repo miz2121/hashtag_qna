@@ -13,7 +13,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import portfolio.project.hashtagqna.config.auth.PrincipalDetails;
 import portfolio.project.hashtagqna.entity.Member;
-import portfolio.project.hashtagqna.exception.AuthExeption;
 import portfolio.project.hashtagqna.logger.PrintLog;
 import portfolio.project.hashtagqna.repository.MemberRepository;
 
@@ -38,7 +37,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         String header = request.getHeader(JwtProperties.HEADER_STRING);
 
         if (header == null || !header.startsWith(JwtProperties.TOKEN_PREFIX)) {
-            printLog.printInfoLog("\"header is null or header is not bearer token\"");
+            printLog.printInfoLog("\"header is null(maybe login attempt) or header is not bearer token\"");
             chain.doFilter(request, response);
             return;
         }

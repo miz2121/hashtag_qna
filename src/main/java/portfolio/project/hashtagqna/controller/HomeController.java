@@ -8,14 +8,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import portfolio.project.hashtagqna.dto.HashtagDto;
-import portfolio.project.hashtagqna.dto.HomeDto;
-import portfolio.project.hashtagqna.dto.QuestionListDto;
+import portfolio.project.hashtagqna.dto.*;
 import portfolio.project.hashtagqna.service.HashtagService;
 import portfolio.project.hashtagqna.service.QuestionService;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -28,8 +27,15 @@ public class HomeController {
     @ResponseBody
     public ResponseEntity<HomeDto> home() {
         List<QuestionListDto> questionListDtos = questionService.viewFiveQuestions();
-        List<HashtagDto> hashtagDtos = hashtagService.viewAllHashtags();
+        List<HashtagListDto> hashtagListDtoList = new ArrayList<>();
+        for (QuestionListDto q : questionListDtos) {
+            List<HashtagDto> hashtagDtos = hashtagService.viewHashtagsAtQuestion(q.getId());
+            HashtagListDto hashtagListDto = new HashtagListDto(hashtagDtos);
+            hashtagListDtoList.add(hashtagListDto);
+        }
+        HomeQuestionWithHashtagsListDto questionWithHashtagsListDto = new HomeQuestionWithHashtagsListDto(questionListDtos, hashtagListDtoList);
 
-        return new ResponseEntity<>(new HomeDto(questionListDtos, hashtagDtos), HttpStatus.OK);
+        List<HashtagDto> hashtagDtoList = hashtagService.viewAllHashtags();
+        return new ResponseEntity<>(new HomeDto(questionWithHashtagsListDto, new HomeHashtagListDto(hashtagDtoList)), HttpStatus.OK);
     }
 }

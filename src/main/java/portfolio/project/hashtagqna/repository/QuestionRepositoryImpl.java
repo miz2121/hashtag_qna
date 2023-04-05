@@ -8,7 +8,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import portfolio.project.hashtagqna.dto.*;
-import portfolio.project.hashtagqna.entity.Hashtag;
 import portfolio.project.hashtagqna.entity.Member;
 import portfolio.project.hashtagqna.entity.Question;
 
@@ -33,16 +32,18 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     }
 
     @Override
-    public QuestionDto viewQuestion(Long id) {
+    public QuestionDto viewQuestion(Long loginUserId, Long id) {
         return queryFactory
                 .select(new QQuestionDto(
+                        question.id,
                         question.title,
                         question.writer,
                         question.date,
                         question.content,
                         question.questionStatus,
                         question.quCommentCount,
-                        question.answerCount))
+                        question.answerCount,
+                        questionWriterIdEq(loginUserId)))
                 .from(question)
                 .where(question.id.eq(id))
                 .fetchFirst();
@@ -52,11 +53,13 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     public List<QuestionListDto> viewFiveQuestions() {
         return queryFactory
                 .select(new QQuestionListDto(
+                        question.id,
                         question.writer,
                         question.title,
                         question.questionStatus,
                         question.answerCount,
-                        question.date))
+                        question.date
+                ))
                 .from(question)
                 .offset(0)
                 .limit(5)
@@ -68,6 +71,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     public Page<QuestionListDto> viewQuestionsPagingOrdering(Pageable pageable) {
         List<QuestionListDto> content = queryFactory
                 .select(new QQuestionListDto(
+                        question.id,
                         question.writer,
                         question.title,
                         question.questionStatus,
@@ -89,11 +93,12 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     public Page<QuestionListDto> searchForQuestionWriterPagingOrdering(String text, Pageable pageable) {
         List<QuestionListDto> content = queryFactory
                 .select(new QQuestionListDto(
+                        question.id,
                         question.writer,
                         question.title,
                         question.questionStatus,
                         question.answerCount,
-                        question.date))
+                        question.date)).distinct()
                 .from(question)
                 .where(questionWriterCt(text))
                 .offset(pageable.getOffset())
@@ -103,6 +108,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
         Integer total = Math.toIntExact(queryFactory
                 .select(question.count())
                 .from(question)
+                .where(questionWriterCt(text))
                 .fetchOne());
         return new PageImpl<>(content, pageable, total);
     }
@@ -111,14 +117,14 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     public Page<QuestionListDto> searchForAnswerWriterPagingOrdering(String text, Pageable pageable) {
         List<QuestionListDto> content = queryFactory
                 .select(new QQuestionListDto(
+                        question.id,
                         question.writer,
                         question.title,
                         question.questionStatus,
                         question.answerCount,
-                        question.date))
+                        question.date)).distinct()
                 .from(question)
-                .join(question.answers, answer)
-                .on(question.id.eq(answer.question.id))
+                .leftJoin(question.answers, answer)
                 .where(answerWriterCt(text))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -127,6 +133,8 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
         Integer total = Math.toIntExact(queryFactory
                 .select(question.count())
                 .from(question)
+                .leftJoin(question.answers, answer)
+                .where(answerWriterCt(text))
                 .fetchOne());
         return new PageImpl<>(content, pageable, total);
     }
@@ -135,18 +143,16 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     public Page<QuestionListDto> searchForCommentWriterPagingOrdering(String text, Pageable pageable) {
         List<QuestionListDto> content = queryFactory
                 .select(new QQuestionListDto(
+                        question.id,
                         question.writer,
                         question.title,
                         question.questionStatus,
                         question.answerCount,
-                        question.date))
+                        question.date)).distinct()
                 .from(question)
-                .join(question.quComments, quComment)
-                .on(question.id.eq(quComment.question.id))
-                .join(question.answers, answer)
-                .on(question.id.eq(answer.question.id))
-                .join(answer.anComments, anComment)
-                .on(answer.id.eq(anComment.answer.id))
+                .leftJoin(question.quComments, quComment)
+                .leftJoin(question.answers, answer)
+                .leftJoin(answer.anComments, anComment)
                 .where(quCommentWriterCt(text).
                         or(anCommentWriterCt(text)))
                 .offset(pageable.getOffset())
@@ -156,6 +162,11 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
         Integer total = Math.toIntExact(queryFactory
                 .select(question.count())
                 .from(question)
+                .leftJoin(question.quComments, quComment)
+                .leftJoin(question.answers, answer)
+                .leftJoin(answer.anComments, anComment)
+                .where(quCommentWriterCt(text).
+                        or(anCommentWriterCt(text)))
                 .fetchOne());
         return new PageImpl<>(content, pageable, total);
     }
@@ -164,13 +175,14 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     public Page<QuestionListDto> searchForTitlePagingOrdering(String text, Pageable pageable) {
         List<QuestionListDto> content = queryFactory
                 .select(new QQuestionListDto(
+                        question.id,
                         question.writer,
                         question.title,
                         question.questionStatus,
                         question.answerCount,
-                        question.date))
+                        question.date)).distinct()
                 .from(question)
-                .where(titleCt(text))
+                .where(questionTitleCt(text))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(question.date.desc())
@@ -178,26 +190,26 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
         Integer total = Math.toIntExact(queryFactory
                 .select(question.count())
                 .from(question)
+                .where(questionTitleCt(text))
                 .fetchOne());
         return new PageImpl<>(content, pageable, total);
     }
 
     @Override
     public Page<QuestionListDto> searchForContentPagingOrdering(String text, Pageable pageable) {
+
         List<QuestionListDto> content = queryFactory
                 .select(new QQuestionListDto(
+                        question.id,
                         question.writer,
                         question.title,
                         question.questionStatus,
                         question.answerCount,
-                        question.date))
+                        question.date)).distinct()
                 .from(question)
-                .join(question.quComments, quComment)
-                .on(question.id.eq(quComment.question.id))
-                .join(question.answers, answer)
-                .on(question.id.eq(answer.question.id))
-                .join(answer.anComments, anComment)
-                .on(answer.id.eq(anComment.answer.id))
+                .leftJoin(question.quComments, quComment)
+                .leftJoin(question.answers, answer)
+                .leftJoin(answer.anComments, anComment)
                 .where(questionContentCt(text)
                         .or(answerContentCt(text))
                         .or(quCommentContentCt(text))
@@ -209,6 +221,13 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
         Integer total = Math.toIntExact(queryFactory
                 .select(question.count())
                 .from(question)
+                .leftJoin(question.quComments, quComment)
+                .leftJoin(question.answers, answer)
+                .leftJoin(answer.anComments, anComment)
+                .where(questionContentCt(text)
+                        .or(answerContentCt(text))
+                        .or(quCommentContentCt(text))
+                        .or(anCommentContentCt(text)))
                 .fetchOne());
         return new PageImpl<>(content, pageable, total);
     }
@@ -217,28 +236,27 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     public Page<QuestionListDto> searchForAllPagingOrdering(String text, Pageable pageable) {
         List<QuestionListDto> content = queryFactory
                 .select(new QQuestionListDto(
+                        question.id,
                         question.writer,
                         question.title,
                         question.questionStatus,
                         question.answerCount,
-                        question.date))
+                        question.date)).distinct()
                 .from(question)
-                .join(question.quComments, quComment)
-                .on(question.id.eq(quComment.question.id))
-                .join(question.answers, answer)
-                .on(question.id.eq(answer.question.id))
-                .join(answer.anComments, anComment)
-                .on(answer.id.eq(anComment.answer.id))
+                .leftJoin(question.quComments, quComment)
+                .leftJoin(question.answers, answer)
+                .leftJoin(answer.anComments, anComment)
                 .where(
                         questionWriterCt(text)
                                 .or(answerWriterCt(text))
                                 .or(quCommentWriterCt(text))
                                 .or(anCommentWriterCt(text))
-                                .or(titleCt(text))
+                                .or(questionTitleCt(text))
                                 .or(questionContentCt(text))
                                 .or(answerContentCt(text))
                                 .or(quCommentContentCt(text))
-                                .or(anCommentContentCt(text)))
+                                .or(anCommentContentCt(text))
+                )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(question.date.desc())
@@ -246,6 +264,20 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
         Integer total = Math.toIntExact(queryFactory
                 .select(question.count())
                 .from(question)
+                .leftJoin(question.quComments, quComment)
+                .leftJoin(question.answers, answer)
+                .leftJoin(answer.anComments, anComment)
+                .where(
+                        questionWriterCt(text)
+                                .or(answerWriterCt(text))
+                                .or(quCommentWriterCt(text))
+                                .or(anCommentWriterCt(text))
+                                .or(questionTitleCt(text))
+                                .or(questionContentCt(text))
+                                .or(answerContentCt(text))
+                                .or(quCommentContentCt(text))
+                                .or(anCommentContentCt(text))
+                )
                 .fetchOne());
         return new PageImpl<>(content, pageable, total);
     }
@@ -253,25 +285,13 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     @Override
     @Transactional
     public long removeQuestion(Question rmQuestion) {
-        // cascade = CascadeType.REMOVE, orphanRemoval = true을 줬으므로 주석처리
-//        queryFactory
-//                .delete(anComment)
-//                .where(anComment.answer.question.eq(rmQuestion))
-//                .execute();
-//        em.flush();
-//        em.clear();
+
         queryFactory
                 .delete(answer)
                 .where(answer.question.eq(rmQuestion))
                 .execute();
         em.flush();
         em.clear();
-//        queryFactory
-//                .delete(quComment)
-//                .where(quComment.question.eq(rmQuestion))
-//                .execute();
-//        em.flush();
-//        em.clear();
         queryFactory
                 .delete(questionHashtag)
                 .where(questionHashtag.question.eq(rmQuestion))
@@ -306,6 +326,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     public Page<QuestionListDto> viewMyQuestions(Pageable pageable, Member member) {
         List<QuestionListDto> content = queryFactory
                 .select(new QQuestionListDto(
+                        question.id,
                         question.writer,
                         question.title,
                         question.questionStatus,
@@ -315,6 +336,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                 .where(question.member.eq(member))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
+                .orderBy(question.date.desc())
                 .fetch();
         Integer total = Math.toIntExact(queryFactory
                 .select(question.count())
@@ -327,22 +349,21 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     public Page<QuestionListDto> viewMyComments(Pageable pageable, Member member) {
         List<QuestionListDto> content = queryFactory
                 .select(new QQuestionListDto(
+                        question.id,
                         question.writer,
                         question.title,
                         question.questionStatus,
                         question.answerCount,
-                        question.date))
+                        question.date)).distinct()
                 .from(question)
-                .join(question.quComments, quComment)
-                .on(question.id.eq(quComment.question.id))
-                .join(question.answers, answer)
-                .on(question.id.eq(answer.question.id))
-                .join(answer.anComments, anComment)
-                .on(answer.id.eq(anComment.answer.id))
+                .leftJoin(question.quComments, quComment)
+                .leftJoin(question.answers, answer)
+                .leftJoin(answer.anComments, anComment)
                 .where(quComment.member.eq(member)
                         .or(anComment.member.eq(member)))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
+                .orderBy(question.date.desc())
                 .fetch();
         Integer total = Math.toIntExact(queryFactory
                 .select(question.count())
@@ -355,17 +376,18 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     public Page<QuestionListDto> viewMyAnswers(Pageable pageable, Member member) {
         List<QuestionListDto> content = queryFactory
                 .select(new QQuestionListDto(
+                        question.id,
                         question.writer,
                         question.title,
                         question.questionStatus,
                         question.answerCount,
-                        question.date))
+                        question.date)).distinct()
                 .from(question)
-                .join(question.answers, answer)
-                .on(question.id.eq(answer.question.id))
+                .innerJoin(question.answers, answer)
                 .where(answer.member.eq(member))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
+                .orderBy(question.date.desc())
                 .fetch();
         Integer total = Math.toIntExact(queryFactory
                 .select(question.count())
@@ -378,19 +400,19 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     public Page<QuestionListDto> viewMyHashtags(Pageable pageable, Member member) {
         List<QuestionListDto> content = queryFactory
                 .select(new QQuestionListDto(
+                        question.id,
                         question.writer,
                         question.title,
                         question.questionStatus,
                         question.answerCount,
-                        question.date))
+                        question.date)).distinct()
                 .from(question)
-                .join(question.questionHashtags, questionHashtag)
-                .on(question.id.eq(questionHashtag.id))
-                .join(questionHashtag.hashtag, hashtag)
-                .on(hashtag.id.eq(questionHashtag.hashtag.id))
+                .innerJoin(question.questionHashtags, questionHashtag)
+                .innerJoin(questionHashtag.hashtag, hashtag)
                 .where(hashtag.member.eq(member))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
+                .orderBy(question.date.desc())
                 .fetch();
         Integer total = Math.toIntExact(queryFactory
                 .select(question.count())
@@ -401,10 +423,10 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 
     @Override
     @Transactional
-    public long updateNickname(Long oldMemberId, Member editedMember) {
+    public long updateNickname(Long oldMemberId, String nickname) {
         long execute = queryFactory
                 .update(question)
-                .set(question.writer, editedMember.getNickname())
+                .set(question.writer, nickname)
                 .where(question.member.id.eq(oldMemberId))
                 .execute();
         em.flush();
@@ -416,19 +438,19 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     public Page<QuestionListDto> viewQuestionsByOneHashtag(Pageable pageable, String hashtagName) {
         List<QuestionListDto> content = queryFactory
                 .select(new QQuestionListDto(
+                        question.id,
                         question.writer,
                         question.title,
                         question.questionStatus,
                         question.answerCount,
                         question.date))
                 .from(question)
-                .join(question.questionHashtags, questionHashtag)
-                .on(question.id.eq(questionHashtag.question.id))
-                .join(questionHashtag.hashtag)
-                .on(hashtag.id.eq(questionHashtag.hashtag.id))
+                .innerJoin(question.questionHashtags, questionHashtag)
+                .innerJoin(questionHashtag.hashtag)
                 .where(hashtag.hashtagName.eq(hashtagName))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
+                .orderBy(question.date.desc())
                 .fetch();
         Integer total = Math.toIntExact(queryFactory
                 .select(question.count())
@@ -438,7 +460,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 
     }
 
-    private BooleanExpression titleCt(String text) {
+    private BooleanExpression questionTitleCt(String text) {
         return text != null ? question.title.containsIgnoreCase(text) : null;
     }
 
@@ -474,4 +496,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
         return writer != null ? anComment.writer.containsIgnoreCase(writer) : null;
     }
 
+    private BooleanExpression questionWriterIdEq(Long loginUserIdCond) {
+        return loginUserIdCond != null ? question.member.id.eq(loginUserIdCond) : null;
+    }
 }

@@ -11,7 +11,7 @@ import portfolio.project.hashtagqna.entity.Question;
 import java.util.List;
 
 public interface QuestionRepositoryCustom {
-    public QuestionDto viewQuestion(Long id);
+    public QuestionDto viewQuestion(Long loginUserId, Long id);
 
     public List<QuestionListDto> viewFiveQuestions();
 
@@ -41,7 +41,7 @@ public interface QuestionRepositoryCustom {
 
     public Page<QuestionListDto> viewMyHashtags(Pageable pageable, Member member);
 
-    public long updateNickname(Long oldMemberId, Member editedMember);
+    public long updateNickname(Long oldMemberId, String nickname);
 
     public Page<QuestionListDto> viewQuestionsByOneHashtag(Pageable pageable, String hashtagName);
 }

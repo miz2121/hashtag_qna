@@ -1,5 +1,8 @@
 package portfolio.project.hashtagqna.repository;
 
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.jpa.impl.JPAUpdateClause;
 import jakarta.persistence.CascadeType;
@@ -17,6 +20,7 @@ import java.util.List;
 
 import static portfolio.project.hashtagqna.entity.QAnComment.anComment;
 import static portfolio.project.hashtagqna.entity.QAnswer.answer;
+import static portfolio.project.hashtagqna.entity.QMember.member;
 
 public class AnswerRepositoryImpl implements AnswerRepositoryCustom {
     private final JPAQueryFactory queryFactory;
@@ -30,7 +34,7 @@ public class AnswerRepositoryImpl implements AnswerRepositoryCustom {
 
     // https://www.notion.so/V2-DTO-bcd7e97b3935458c910de08bd5a44bf2 참고
     @Override
-    public List<AnswerDto> viewAnswers(Long questionId) {
+    public List<AnswerDto> viewAnswers(Long loginUserId, Long questionId) {
         return queryFactory
                 .select(new QAnswerDto(
                         answer.id,
@@ -39,8 +43,8 @@ public class AnswerRepositoryImpl implements AnswerRepositoryCustom {
                         answer.content,
                         answer.answerStatus,
                         answer.anCommentCount,
-                        answer.rating
-                ))
+                        answer.rating,
+                        answerWriterIdEq(loginUserId)))
                 .from(answer)
                 .where(answer.question.id.eq(questionId))
                 .fetch();
@@ -49,13 +53,6 @@ public class AnswerRepositoryImpl implements AnswerRepositoryCustom {
     @Override
     @Transactional
     public long removeAnswer(Answer rmAnswer) {
-        // cascade = CascadeType.REMOVE, orphanRemoval = true 을 줬으므로 주석처리
-//        queryFactory
-//                .delete(anComment)
-//                .where(anComment.answer.eq(rmAnswer))
-//                .execute();
-//        em.flush();
-//        em.clear();
         long execute = queryFactory
                 .delete(answer)
                 .where(answer.eq(rmAnswer))
@@ -67,10 +64,10 @@ public class AnswerRepositoryImpl implements AnswerRepositoryCustom {
 
     @Override
     @Transactional
-    public long updateNickname(Long oldMemberId, Member editedMember) {
+    public long updateNickname(Long oldMemberId, String nickname) {
         long execute = queryFactory
                 .update(answer)
-                .set(answer.writer, editedMember.getNickname())
+                .set(answer.writer, nickname)
                 .where(answer.member.id.eq(oldMemberId))
                 .execute();
         em.flush();
@@ -90,5 +87,9 @@ public class AnswerRepositoryImpl implements AnswerRepositoryCustom {
         em.flush();
         em.clear();
         return execute;
+    }
+
+    private BooleanExpression answerWriterIdEq(Long loginUserIdCond){
+        return loginUserIdCond != null ? answer.member.id.eq(loginUserIdCond) : null;
     }
 }

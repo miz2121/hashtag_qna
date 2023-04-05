@@ -7,14 +7,14 @@ import java.util.List;
 
 @Data
 public class HomeDto {
-    List<QuestionListDto> questionListDtos = new ArrayList<>();
-    List<HashtagDto> hashtagDtos = new ArrayList<>();
+    private HomeQuestionWithHashtagsListDto homeQuestionWithHashtagsListDto;
+    private HomeHashtagListDto homeHashtagListDto;
 
     public HomeDto() {
     }
 
-    public HomeDto(List<QuestionListDto> questionListDtos, List<HashtagDto> hashtagDtos) {
-        this.questionListDtos = questionListDtos;
-        this.hashtagDtos = hashtagDtos;
+    public HomeDto(HomeQuestionWithHashtagsListDto homeQuestionWithHashtagsListDto, HomeHashtagListDto homeHashtagListDto) {
+        this.homeQuestionWithHashtagsListDto = homeQuestionWithHashtagsListDto;
+        this.homeHashtagListDto = homeHashtagListDto;
     }
 }

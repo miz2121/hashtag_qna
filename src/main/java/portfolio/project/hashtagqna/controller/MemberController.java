@@ -7,9 +7,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import portfolio.project.hashtagqna.config.auth.PrincipalDetails;
-import portfolio.project.hashtagqna.dto.HashtagDto;
-import portfolio.project.hashtagqna.dto.MemberDto;
-import portfolio.project.hashtagqna.dto.MemberInfoDto;
+import portfolio.project.hashtagqna.dto.*;
 import portfolio.project.hashtagqna.entity.Member;
 import portfolio.project.hashtagqna.service.HashtagService;
 import portfolio.project.hashtagqna.service.MemberService;
@@ -41,10 +39,10 @@ public class MemberController {
 
     @PostMapping("/login")
     public ResponseEntity<Object> login(
-            Authentication authentication) {
+            Authentication authentication
+            ) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-
-        memberService.logIn(principal.getUsername(), principal.getPassword());
+//        memberService.logIn(principal.getUsername(), principal.getPassword());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -70,23 +68,22 @@ public class MemberController {
     }
 
     @PatchMapping("/members")
-    public ResponseEntity<Object> edit(
+    public ResponseEntity<Object> editNickname(
             Authentication authentication,
-            @RequestBody MemberDto memberDto) {
+            @RequestBody MemberNicknameDto memberNicknameDto) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         Member member = memberService.findMemberById(principal.getMember().getId());
 
         Member editedMember = Member.builder()
                 .email(member.getEmail())
-                .pwd(bCryptPasswordEncoder.encode(memberDto.getPwd()))
-                .nickname(memberDto.getNickname())
+                .pwd(member.getPwd())
+                .nickname(memberNicknameDto.getNickname())
                 .build();
-        memberService.editMember(member.getId(), editedMember);
+        memberService.editNickname(member.getId(), memberNicknameDto.getNickname());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.add("Location", "/home");  // redirect
-        headers.add("Email", memberDto.getEmail());
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
@@ -107,10 +104,11 @@ public class MemberController {
      */
     @GetMapping("/members/hashtags")
     @ResponseBody
-    public ResponseEntity<List<HashtagDto>> myAllHashtags(Authentication authentication) {
+    public ResponseEntity<HashtagListDto> myAllHashtags(Authentication authentication) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         Long loginMemberId = principal.getMember().getId();
         List<HashtagDto> hashtagDtos = hashtagService.viewAllMyHashtags(loginMemberId);
-        return new ResponseEntity<>(hashtagDtos, HttpStatus.OK);
+        HashtagListDto memberHashtagsDto = new HashtagListDto(hashtagDtos);
+        return new ResponseEntity<>(memberHashtagsDto, HttpStatus.OK);
     }
 }

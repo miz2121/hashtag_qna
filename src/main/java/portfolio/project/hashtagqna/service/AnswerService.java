@@ -5,11 +5,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import portfolio.project.hashtagqna.dto.AnswerDto;
 import portfolio.project.hashtagqna.entity.*;
-import portfolio.project.hashtagqna.exception.AuthExeption;
+import portfolio.project.hashtagqna.exception.RestApiException;
+import portfolio.project.hashtagqna.exception.code.AuthErrorCode;
+import portfolio.project.hashtagqna.exception.code.CommonErrorCode;
 import portfolio.project.hashtagqna.repository.AnswerRepository;
 import portfolio.project.hashtagqna.repository.MemberRepository;
 import portfolio.project.hashtagqna.repository.QuestionRepository;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -31,9 +35,9 @@ public class AnswerService {
     public Long addAnswer(Long questionId, Answer answer, Member loginUser) {
         Question question = questionRepository.findQuestionById(questionId);
         if (question.getQuestionStatus() == QuestionStatus.CLOSED) {
-            throw new AuthExeption("채택된 글에는 답변을 더 이상 달 수 없습니다.");
+            throw new RestApiException(AuthErrorCode.CLOSED_QUESTION_AUTH);
         } else if (question.getMember() == loginUser) {
-            throw new AuthExeption("작성자가 아닌 사람이 답변을 달 수 있습니다.");
+            throw new RestApiException(AuthErrorCode.ANSWER_AUTH);
         }
         answerRepository.save(answer);
         answer.addQuestionAndMember(question, loginUser);
@@ -49,13 +53,19 @@ public class AnswerService {
      */
     @Transactional
     public Long makeAnswerSelectedAndGiveScore(String scoreString, Long questionId, Long answerId, Long loginUserId) {
+        List<String> scoreList = new ArrayList<String>(Arrays.asList("1", "2", "3", "4", "5"));
+        scoreString = scoreString.replaceAll("(\\r\\n|\\r|\\n|\\n\\r)", "").replaceAll(" ", "");
+        if (!scoreList.contains(scoreString)){
+            throw new RestApiException(CommonErrorCode.INVALID_PARAMETER);
+        }
+
         Question question = questionRepository.findQuestionById(questionId);
         Answer answer = answerRepository.findAnswerById(answerId);
         if (!Objects.equals(question.getMember().getId(), loginUserId)) {
-            throw new AuthExeption("질문 작성자가 아닌 사람은 채택할 수 없습니다.");
+            throw new RestApiException(AuthErrorCode.SELECT_AUTH);
         }
         if (question.getQuestionStatus().equals(QuestionStatus.CLOSED)){
-            throw new AuthExeption("닫힌 질문 글은 더 이상 수정할 수 없습니다.");
+            throw new RestApiException(AuthErrorCode.CLOSED_QUESTION_AUTH);
         }
         answer.selectAnswer();
         answer.giveScore(scoreString);
@@ -66,10 +76,10 @@ public class AnswerService {
     @Transactional
     public Long updateAnswer(Answer oldAnswer, Answer editedAnswer, Member loginUser, Question question) {
         if (oldAnswer.getMember() != loginUser) {
-            throw new AuthExeption("답변 작성자만이 답변을 수정할 수 있습니다.");
+            throw new RestApiException(AuthErrorCode.EDIT_ANSWER_AUTH);
         }
         if (question.getQuestionStatus().equals(QuestionStatus.CLOSED)){
-            throw new AuthExeption("닫힌 질문 글은 더 이상 수정할 수 없습니다.");
+            throw new RestApiException(AuthErrorCode.CLOSED_QUESTION_AUTH);
         }
         return answerRepository.updateAnswer(oldAnswer, editedAnswer);
     }
@@ -81,10 +91,10 @@ public class AnswerService {
         Member loginUser = memberRepository.findMemberById(loginUserId);
 
         if (!Objects.equals(answer.getMember().getId(), loginUserId)) {
-            throw new AuthExeption("답변 작성자만이 답변을 삭제할 수 있습니다.");
+            throw new RestApiException(AuthErrorCode.EDIT_ANSWER_AUTH);
         }
         if (question.getQuestionStatus().equals(QuestionStatus.CLOSED)){
-            throw new AuthExeption("닫힌 질문 글은 더 이상 수정 및 삭제할 수 없습니다.");
+            throw new RestApiException(AuthErrorCode.CLOSED_QUESTION_AUTH);
         }
 
         question.decreaseAnswerCount();
@@ -92,8 +102,8 @@ public class AnswerService {
         return answerRepository.removeAnswer(answer);
     }
 
-    public List<AnswerDto> viewAnswers(Long questionId){
-        return answerRepository.viewAnswers(questionId);
+    public List<AnswerDto> viewAnswers(Long loginUserId, Long questionId){
+        return answerRepository.viewAnswers(loginUserId, questionId);
     }
 
     public Answer findAnswerById(Long answerId) {

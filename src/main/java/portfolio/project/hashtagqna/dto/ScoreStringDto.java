@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class ScoreStringDto {
-    String scoreString;
+    private String scoreString;
 
     public ScoreStringDto() {
     }

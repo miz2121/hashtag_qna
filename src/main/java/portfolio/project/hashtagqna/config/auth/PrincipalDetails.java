@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import portfolio.project.hashtagqna.entity.Member;
+import portfolio.project.hashtagqna.exception.RestApiException;
+import portfolio.project.hashtagqna.exception.code.MemberErrorCode;
 
 import java.util.Collection;
 

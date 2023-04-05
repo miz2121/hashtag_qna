@@ -1,9 +1,12 @@
 package portfolio.project.hashtagqna.repository;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.jpa.impl.JPAUpdateClause;
 import jakarta.persistence.EntityManager;
+import org.eclipse.jdt.internal.compiler.ast.Expression;
 import org.springframework.transaction.annotation.Transactional;
 import portfolio.project.hashtagqna.dto.AnCommentDto;
 import portfolio.project.hashtagqna.dto.QAnCommentDto;
@@ -14,6 +17,7 @@ import portfolio.project.hashtagqna.entity.Question;
 import java.util.List;
 
 import static portfolio.project.hashtagqna.entity.QAnComment.anComment;
+import static portfolio.project.hashtagqna.entity.QAnswer.answer;
 
 public class AnCommentRepositoryImpl implements AnCommentRepositoryCustom {
     private final JPAQueryFactory queryFactory;
@@ -25,13 +29,15 @@ public class AnCommentRepositoryImpl implements AnCommentRepositoryCustom {
     }
 
     @Override
-    public List<AnCommentDto> viewAnComments(Long questionId) {
+    public List<AnCommentDto> viewAnComments(Long loginUserId, Long questionId) {
         return queryFactory
                 .select(new QAnCommentDto(
+                        anComment.id,
                         anComment.answer.id,
                         anComment.writer,
                         anComment.date,
-                        anComment.content))
+                        anComment.content,
+                        anCommentWriterIdEq(loginUserId)))
                 .from(anComment)
                 .where(anComment.answer.question.id.eq(questionId))
                 .fetch();
@@ -51,10 +57,10 @@ public class AnCommentRepositoryImpl implements AnCommentRepositoryCustom {
 
     @Override
     @Transactional
-    public long updateNickname(Long oldMemberId, Member editedMember) {
+    public long updateNickname(Long oldMemberId, String nickname) {
         long execute = queryFactory
                 .update(anComment)
-                .set(anComment.writer, editedMember.getNickname())
+                .set(anComment.writer, nickname)
                 .where(anComment.member.id.eq(oldMemberId))
                 .execute();
         em.flush();
@@ -74,5 +80,8 @@ public class AnCommentRepositoryImpl implements AnCommentRepositoryCustom {
         em.flush();
         em.clear();
         return execute;
+    }
+    private BooleanExpression anCommentWriterIdEq(Long loginUserIdCond){
+        return loginUserIdCond != null ? anComment.member.id.eq(loginUserIdCond) : null;
     }
 }

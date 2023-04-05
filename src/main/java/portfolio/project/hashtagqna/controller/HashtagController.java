@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import portfolio.project.hashtagqna.dto.HashtagDto;
+import portfolio.project.hashtagqna.dto.HashtagListDto;
 import portfolio.project.hashtagqna.service.HashtagService;
 
 import java.util.List;
@@ -20,8 +21,8 @@ public class HashtagController {
 
     @GetMapping("/hashtags")
     @ResponseBody
-    public ResponseEntity<List<HashtagDto>> hashtags() {
+    public ResponseEntity<HashtagListDto> hashtags() {
         List<HashtagDto> hashtagDtos = hashtagService.viewAllHashtags();
-        return new ResponseEntity<>(hashtagDtos, HttpStatus.OK);
+        return new ResponseEntity<>(new HashtagListDto(hashtagDtos), HttpStatus.OK);
     }
 }

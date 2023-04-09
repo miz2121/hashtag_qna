@@ -1,6 +1,7 @@
 package portfolio.project.hashtagqna.repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -37,7 +38,11 @@ public class AnCommentRepositoryImpl implements AnCommentRepositoryCustom {
                         anComment.writer,
                         anComment.date,
                         anComment.content,
-                        anCommentWriterIdEq(loginUserId)))
+                        new CaseBuilder()
+                                .when(anCommentWriterIdEq(loginUserId))
+                                .then(true)
+                                .otherwise(false)
+                ))
                 .from(anComment)
                 .where(anComment.answer.question.id.eq(questionId))
                 .fetch();

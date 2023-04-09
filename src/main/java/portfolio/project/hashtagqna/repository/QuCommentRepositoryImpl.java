@@ -1,6 +1,7 @@
 package portfolio.project.hashtagqna.repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -32,7 +33,11 @@ public class QuCommentRepositoryImpl implements QuCommentRepositoryCustom {
                         quComment.writer,
                         quComment.date,
                         quComment.content,
-                        quCommentWriterIdEq(loginUserId)))
+                new CaseBuilder()
+                        .when(quCommentWriterIdEq(loginUserId))
+                        .then(true)
+                        .otherwise(false)
+                ))
                 .from(quComment)
                 .where(quComment.question.id.eq(questionId))
                 .fetch();

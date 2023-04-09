@@ -2,6 +2,7 @@ package portfolio.project.hashtagqna.repository;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.jpa.impl.JPAUpdateClause;
@@ -44,7 +45,11 @@ public class AnswerRepositoryImpl implements AnswerRepositoryCustom {
                         answer.answerStatus,
                         answer.anCommentCount,
                         answer.rating,
-                        answerWriterIdEq(loginUserId)))
+                        new CaseBuilder()
+                                .when(answerWriterIdEq(loginUserId))
+                                .then(true)
+                                .otherwise(false)
+                ))
                 .from(answer)
                 .where(answer.question.id.eq(questionId))
                 .fetch();

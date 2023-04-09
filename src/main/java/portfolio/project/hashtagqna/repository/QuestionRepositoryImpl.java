@@ -1,6 +1,8 @@
 package portfolio.project.hashtagqna.repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Page;
@@ -43,7 +45,11 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
                         question.questionStatus,
                         question.quCommentCount,
                         question.answerCount,
-                        questionWriterIdEq(loginUserId)))
+                        new CaseBuilder()
+                                .when(questionWriterIdEq(loginUserId))
+                                .then(true)
+                                .otherwise(false))
+                )
                 .from(question)
                 .where(question.id.eq(id))
                 .fetchFirst();
@@ -497,6 +503,6 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
     }
 
     private BooleanExpression questionWriterIdEq(Long loginUserIdCond) {
-        return loginUserIdCond != null ? question.member.id.eq(loginUserIdCond) : null;
+        return loginUserIdCond != null ? Expressions.asBoolean(question.member.id.eq(loginUserIdCond)) : null;
     }
 }
